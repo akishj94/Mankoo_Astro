@@ -1,0 +1,366 @@
+---
+import { Image } from 'astro:assets';
+import 'swiper/css';
+
+import crossShaftImage from '../../assets/IMG_202.jpg';
+import hFrameImage from '../../assets/IMG_202.jpg';
+import cFrameImage from '../../assets/IMG_202.jpg';
+import knuckleJointImage from '../../assets/IMG_202.jpg';
+import straightSideImage from '../../assets/IMG_202.jpg';
+import doubleCrankImage from '../../assets/IMG_202.jpg';
+---
+
+<section
+  data-slider
+  class="bg-white py-14 text-ink sm:py-16 lg:py-[clamp(76px,5vw,100px)]"
+>
+  <div class="container">
+    <div class="flex items-end justify-between gap-8" data-reveal>
+      <div class="w-full min-w-0 md:max-w-[clamp(55%,70vw,920px)]">
+        <p class="text-[14px] uppercase tracking-[0.2em] text-accent">
+          THE MACHINES RANGE
+        </p>
+
+        <h2
+          class="mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]"
+        >
+          Seven machine families. One standard - They keep running, shift after shift, year after year.
+        </h2>
+      </div>
+
+      <a
+        href="https://mankoopresses.com/machines/"
+        class="group/view-all inline-flex shrink-0 items-center gap-2 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+      >
+        View all
+      </a>
+    </div>
+
+    <div class="mt-10 sm:mt-14">
+      <div class="swiper" data-slider-root>
+        <ul class="swiper-wrapper">
+          <li class="swiper-slide">
+            <a
+              href="https://www.mankoopresses.com/product/cross-shaft-1/"
+              class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            >
+              <div class="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={crossShaftImage}
+                  alt="Cross Shaft Power Press"
+                  width={800}
+                  height={1000}
+                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/slide:scale-110 group-focus-visible/slide:scale-110"
+                />
+              </div>
+
+              <h3 class="mt-5 text-[20px] tracking-tight">
+                Cross Shaft Power Presses
+              </h3>
+
+              <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-[#616161]">
+                Heavy-duty power presses engineered for precision stamping,
+                forming and industrial production.
+              </p>
+            </a>
+          </li>
+
+          <li class="swiper-slide">
+            <a
+              href="https://mankoopresses.com/h-frame-mechanical-power-press/"
+              class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            >
+              <div class="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={hFrameImage}
+                  alt="H Frame Mechanical Power Press"
+                  width={800}
+                  height={1000}
+                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/slide:scale-110 group-focus-visible/slide:scale-110"
+                />
+              </div>
+
+              <h3 class="mt-5 text-[20px] tracking-tight">
+                H Frame Mechanical Power Press
+              </h3>
+
+              <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-[#616161]">
+                Robust H-frame construction designed for reliable industrial
+                pressing operations.
+              </p>
+            </a>
+          </li>
+
+          <li class="swiper-slide">
+            <a
+              href="https://mankoopresses.com/c-frame-mechanical-power-press/"
+              class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            >
+              <div class="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={cFrameImage}
+                  alt="C Frame Mechanical Power Press"
+                  width={800}
+                  height={1000}
+                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/slide:scale-110 group-focus-visible/slide:scale-110"
+                />
+              </div>
+
+              <h3 class="mt-5 text-[20px] tracking-tight">
+                C Frame Mechanical Power Press
+              </h3>
+
+              <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-[#616161]">
+                Versatile mechanical presses for punching, bending and
+                precision metal forming.
+              </p>
+            </a>
+          </li>
+
+          <li class="swiper-slide">
+            <a
+              href="https://mankoopresses.com/knuckle-joint-press/"
+              class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            >
+              <div class="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={knuckleJointImage}
+                  alt="Knuckle Joint Press"
+                  width={800}
+                  height={1000}
+                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/slide:scale-110 group-focus-visible/slide:scale-110"
+                />
+              </div>
+
+              <h3 class="mt-5 text-[20px] tracking-tight">
+                Knuckle Joint Press
+              </h3>
+
+              <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-[#616161]">
+                High-force pressing technology for demanding forming and
+                coining applications.
+              </p>
+            </a>
+          </li>
+
+          <li class="swiper-slide">
+            <a
+              href="https://mankoopresses.com/shop/straight-side-cross-shaft-power-press/"
+              class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            >
+              <div class="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={straightSideImage}
+                  alt="Straight Side Cross Shaft Power Press"
+                  width={800}
+                  height={1000}
+                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/slide:scale-110 group-focus-visible/slide:scale-110"
+                />
+              </div>
+
+              <h3 class="mt-5 text-[20px] tracking-tight">
+                Straight Side Cross Shaft Power Press
+              </h3>
+
+              <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-[#616161]">
+                Rigid frame construction designed for accurate progressive-die
+                and metal-forming applications.
+              </p>
+            </a>
+          </li>
+
+          <li class="swiper-slide">
+            <a
+              href="https://mankoopresses.com/shop/straight-side-double-crank-power-press/"
+              class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            >
+              <div class="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={doubleCrankImage}
+                  alt="Double Crank Power Press"
+                  width={800}
+                  height={1000}
+                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/slide:scale-110 group-focus-visible/slide:scale-110"
+                />
+              </div>
+
+              <h3 class="mt-5 text-[20px] tracking-tight">
+                Straight Side Double Crank Power Press
+              </h3>
+
+              <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-[#616161]">
+                Two-point pressing design built for stable, consistent
+                performance in production environments.
+              </p>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mt-10 flex items-center justify-center gap-6 sm:mt-12 lg:hidden">
+        <div
+          class="slider-pagination flex items-center"
+          data-slider-pagination
+        ></div>
+
+        <div class="hidden items-center gap-2">
+          <button
+            type="button"
+            data-slider-prev
+            aria-label="Previous machine"
+            class="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-ink/15 text-ink transition-colors hover:border-ink/40 hover:bg-ink/5 disabled:cursor-default disabled:border-ink/15 disabled:bg-transparent disabled:opacity-30 disabled:hover:border-ink/15 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
+            <svg
+              width="15"
+              height="24"
+              viewBox="0 -960 960 960"
+              fill="currentColor"
+              aria-hidden="true"
+              class="-scale-x-100"
+            >
+              <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            data-slider-next
+            aria-label="Next machine"
+            class="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-ink/15 text-ink transition-colors hover:border-ink/40 hover:bg-ink/5 disabled:cursor-default disabled:border-ink/15 disabled:bg-transparent disabled:opacity-30 disabled:hover:border-ink/15 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
+            <svg
+              width="15"
+              height="24"
+              viewBox="0 -960 960 960"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .slider-pagination {
+    gap: 0.5rem;
+  }
+
+  .slider-pagination :global(.swiper-pagination-bullet) {
+    appearance: none;
+    width: 1.5rem;
+    height: 0.25rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background-color: rgb(0 10 34 / 0.18);
+    cursor: pointer;
+    transition:
+      width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+      background-color 0.3s ease;
+  }
+
+  .slider-pagination :global(.swiper-pagination-bullet-active) {
+    width: 2.75rem;
+    background-color: var(--color-ink);
+  }
+
+  .slider-pagination :global(.swiper-pagination-bullet:focus-visible) {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  [data-slider] :global(.swiper-button-lock) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slider-pagination :global(.swiper-pagination-bullet) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import Swiper from 'swiper';
+  import { A11y, Keyboard, Navigation, Pagination } from 'swiper/modules';
+
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  );
+
+  document.querySelectorAll<HTMLElement>('[data-slider]').forEach((section) => {
+    const root = section.querySelector<HTMLElement>('[data-slider-root]');
+    const pagination = section.querySelector<HTMLElement>(
+      '[data-slider-pagination]',
+    );
+    const prev = section.querySelector<HTMLButtonElement>('[data-slider-prev]');
+    const next = section.querySelector<HTMLButtonElement>('[data-slider-next]');
+
+    if (!root || !pagination || !prev || !next) return;
+
+    new Swiper(root, {
+      modules: [A11y, Keyboard, Navigation, Pagination],
+      slidesPerView: 1.15,
+      spaceBetween: 8,
+      grabCursor: true,
+      watchOverflow: true,
+      speed: reducedMotion.matches ? 0 : 600,
+      keyboard: {
+        enabled: true,
+        onlyInViewport: true,
+      },
+      a11y: {
+        prevSlideMessage: 'Previous machine',
+        nextSlideMessage: 'Next machine',
+        paginationBulletMessage: 'Go to machine {{index}}',
+        containerRoleDescriptionMessage: 'carousel',
+      },
+      navigation: {
+        prevEl: prev,
+        nextEl: next,
+      },
+      pagination: {
+        el: pagination,
+        clickable: true,
+        bulletElement: 'button',
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 2.15,
+          spaceBetween: 16,
+        },
+        1024: {
+          slidesPerView: 3.15,
+          spaceBetween: 16,
+        },
+        1536: {
+          slidesPerView: 4,
+          spaceBetween: 22,
+        },
+      },
+    });
+  });
+</script>

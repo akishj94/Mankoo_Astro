@@ -1,0 +1,119 @@
+
+@import "tailwindcss";
+
+/* --------------------------------------------------
+   Global theme
+-------------------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  --container-margin: clamp(1rem, 0.7857rem + 1.0714vw, 2.5rem);
+  --container-max-width: 160rem;
+
+  --color-body-bg: #000a22;
+  --color-body-text: #ffffff;
+  --color-accent: #f98343;
+
+  --header-height: 68px;
+}
+
+/* --------------------------------------------------
+   Tailwind theme configuration
+-------------------------------------------------- */
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+
+  --color-ink: #000a22;
+  --color-accent: #f98343;
+  --color-muted: #a3aab9;
+}
+
+/* --------------------------------------------------
+   Container
+-------------------------------------------------- */
+
+@utility container {
+  width: calc(100% - var(--container-margin) * 2);
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+}
+
+/* --------------------------------------------------
+   Base styles
+-------------------------------------------------- */
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--color-body-bg);
+  color: var(--color-body-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+/* --------------------------------------------------
+   Accessibility
+-------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+svg[data-icon-play].hidden, svg[data-icon-pause].hidden{
+    display: none !important;
+}

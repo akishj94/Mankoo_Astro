@@ -1,0 +1,103 @@
+---
+interface Props {
+  src: string;
+  type?: string;
+  aspectRatio?: string;
+  label?: string;
+}
+
+const {
+  src,
+  type = 'video/mp4',
+  aspectRatio,
+  label = 'Background video',
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'relative isolate w-full overflow-hidden bg-neutral-900',
+    !aspectRatio && 'min-h-svh',
+  ]}
+  style={aspectRatio ? `aspect-ratio: ${aspectRatio}` : undefined}
+  data-video-player
+  data-video-label={label}
+>
+  <video
+    class="absolute inset-0 -z-10 size-full object-cover"
+    src={src}
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    data-hero-video
+    aria-label={label}
+  >
+    <source src={src} type={type} />
+  </video>
+
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-black/50"
+    aria-hidden="true"
+  ></div>
+
+  <button
+    type="button"
+    data-video-toggle
+    aria-label="Pause background video"
+    aria-pressed="false"
+    class="absolute bottom-8 right-8 z-10 grid size-10 shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 text-white backdrop-blur-[0.5rem] transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:bottom-12 sm:right-12"
+  >
+    <svg
+      class="pointer-events-none absolute inset-0 size-full -rotate-90"
+      viewBox="0 0 40 40"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        cx="20"
+        cy="20"
+        r="19"
+        stroke="currentColor"
+        stroke-opacity="0.35"
+        stroke-width="2"
+      />
+      <circle
+        data-video-progress
+        cx="20"
+        cy="20"
+        r="19"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-dasharray="119.38"
+        stroke-dashoffset="119.38"
+      />
+    </svg>
+
+    <svg
+      data-icon-pause
+      width="13"
+      height="13"
+      viewBox="0 0 14 14"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <rect x="3" y="2" width="3" height="10" rx="1" />
+      <rect x="8" y="2" width="3" height="10" rx="1" />
+    </svg>
+
+    <svg
+      data-icon-play
+      class="hidden"
+      width="13"
+      height="13"
+      viewBox="0 0 14 14"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M4 2.5v9a.6.6 0 0 0 .92.5l7-4.5a.6.6 0 0 0 0-1l-7-4.5A.6.6 0 0 0 4 2.5Z" />
+    </svg>
+  </button>
+</div>

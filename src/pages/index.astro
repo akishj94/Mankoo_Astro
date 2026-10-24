@@ -1,0 +1,49 @@
+
+---
+import Layout from "../layouts/Layout.astro";
+import Hero from '../components/blocks/Hero.astro';
+import SplitGrid from '../components/blocks/SplitGrid.astro';
+import ProductCarousel from '../components/blocks/ProductCarousel.astro';
+import FeaturedProduct from '../components/blocks/FeaturedProduct.astro';
+import GridTabs from '../components/blocks/GridTabs.astro';
+import Testimonial from '../components/blocks/Testimonial.astro';
+import StepGrid from '../components/blocks/StepGrid.astro';
+import LatestPosts from '../components/blocks/LatestPosts.astro';
+
+---
+
+<Layout
+  title="Home | Mankoo"
+  description="Explore dependable construction machinery, equipment, company information, and industry news."
+>
+ <Hero />
+ <SplitGrid />
+ <ProductCarousel />
+ <GridTabs />
+ <FeaturedProduct />
+ <StepGrid />
+ <Testimonial />
+ <LatestPosts />
+
+</Layout>
+
+
+<style>
+  .hero-swiper .swiper-pagination {
+    bottom: 28px;
+  }
+
+  .hero-swiper .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: white;
+    opacity: 0.6;
+  }
+
+  .hero-swiper .swiper-pagination-bullet-active {
+    width: 28px;
+    border-radius: 8px;
+    background: #f97316;
+    opacity: 1;
+  }
+</style>

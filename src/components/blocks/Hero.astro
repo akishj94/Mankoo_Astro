@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import heroImage from '../../assets/IMG_202.jpg';
+---
+
+<section
+  class="relative isolate flex min-h-svh flex-col justify-end overflow-hidden bg-neutral-900"
+  data-video-player
+  data-video-label="background video"
+>
+  <Image
+    src={heroImage}
+    alt="Hero background"
+    loading="eager"
+    decoding="sync"
+    fetchpriority="high"
+    class="absolute inset-0 -z-10 size-full object-cover"
+  />
+
+  <video
+    class="absolute inset-0 -z-10 size-full object-cover"
+    src="/public/landing.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    data-hero-video
+  >
+    <source src="/public/hero.mp4" type="video/mp4" />
+  </video>
+
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-black/50"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container relative pb-8 sm:pb-12">
+    <div class="flex items-end justify-between gap-6">
+      <div class="min-w-0 md:max-w-[650px]">
+        <p class="text-xs font-light uppercase tracking-[0.2em] text-white/70">
+          MANKOO INDIA · LUDHIANA · SINCE 1974
+        </p>
+
+        <h1 class="mt-4 text-[clamp(30px,4vw,56.5px)] font-normal leading-[1.08] tracking-tight text-white">
+          Leading and dedicated Power Press Manufacturer, Since 1974
+        </h1>
+
+        <a
+          href="/contact"
+          class="mt-8 inline-flex min-w-[152px] items-center justify-center rounded-[10px] bg-[rgba(246,246,246,0.2)] px-6 py-3 text-sm text-white backdrop-blur-[3rem] transition-colors hover:bg-[rgba(246,246,246,0.32)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          Discover
+        </a>
+      </div>
+
+      <button
+          type="button"
+          data-video-toggle
+          aria-label="Pause background video"
+          aria-pressed="false"
+          class="relative grid size-10 shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 text-white backdrop-blur-[0.5rem] transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          <svg
+            class="pointer-events-none absolute inset-0 size-full -rotate-90"
+            viewBox="0 0 40 40"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle
+              cx="20"
+              cy="20"
+              r="19"
+              stroke="currentColor"
+              stroke-opacity="0.35"
+              stroke-width="2"
+            />
+            <circle
+              data-video-progress
+              cx="20"
+              cy="20"
+              r="19"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-dasharray="119.38"
+              stroke-dashoffset="119.38"
+            />
+          </svg>
+
+          <svg data-icon-pause width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+            <rect x="3" y="2" width="3" height="10" rx="1" />
+            <rect x="8" y="2" width="3" height="10" rx="1" />
+          </svg>
+
+          <svg data-icon-play class="hidden" width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+            <path d="M4 2.5v9a.6.6 0 0 0 .92.5l7-4.5a.6.6 0 0 0 0-1l-7-4.5A.6.6 0 0 0 4 2.5Z" />
+          </svg>
+        </button>
+    </div>
+  </div>
+</section>

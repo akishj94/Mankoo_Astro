@@ -1,0 +1,404 @@
+---
+import { Image } from 'astro:assets';
+import megaMenuImage from '../assets/image-cutout-4.webp';
+const details = {
+  menuImage: megaMenuImage,
+  whatsapp: "https://wa.me/911234567890",
+};
+
+const primary = [
+  {
+    label: "Home",
+    url: "/",
+    children: [],
+  },
+  {
+    label: "About",
+    url: "/about",
+    children: [],
+  },
+  {
+    label: "Machines",
+    url: "/machines",
+    children: [
+  { label: "Cross Shaft Power Presses", url: "/products/cross-shaft-power-presses" },
+  { label: "H Frame Mechanical Power Press", url: "/products/h-frame-mechanical-power-press" },
+  { label: "C Frame Mechanical Power Press", url: "/products/c-frame-mechanical-power-press" },
+  { label: "Knuckle Joint Press", url: "/products/knuckle-joint-press" },
+  { label: "Straight Side Cross Shaft Power Press", url: "/products/straight-side-cross-shaft-power-press" },
+  { label: "Two Point H Frame Power Press", url: "/products/two-point-h-frame-power-press" },
+  { label: "Double Crank Cross Shaft Power Press", url: "/products/double-crank-cross-shaft-power-press" },
+  { label: "Straight Side Double Crank Power Press", url: "/products/straight-side-double-crank-power-press" },
+  { label: "Straight Side Single Crank Power Press", url: "/products/straight-side-single-crank-power-press" },
+  { label: "Ungeared C Frame Power Press", url: "/products/ungeared-c-frame-power-press" },
+  { label: "Two Point High Speed Ungeared Press", url: "/products/two-point-high-speed-ungeared-press" },
+  { label: "Plunger Guided Link Motion Press", url: "/products/plunger-guided-link-motion-press" },
+  { label: "Forging Presses", url: "/products/forging-presses" },
+  { label: "Shearing Machine", url: "/products/shearing-machine" },
+  { label: "Drop Forge Hammer", url: "/products/drop-forge-hammer" },
+],
+  },
+  {
+    label: "News",
+    url: "/news",
+    children: [],
+  },
+  {
+    label: "Contact",
+    url: "/contact",
+    children: [],
+  },
+];
+
+const PANEL_PARENT_URLS = ["/machines"];
+
+const isPanelParent = (url: string) =>
+  PANEL_PARENT_URLS.some(
+    (prefix) => url === prefix || url.startsWith(`${prefix}/`)
+  );
+
+const visibleChildren = (children: { url: string; label: string }[]) =>
+  children.filter((child) => child.url !== "");
+
+const whatsappUrl = details.whatsapp;
+
+const navLinkBase =
+  "rounded-lg px-3 py-2 transition-[background-color,color,backdrop-filter] duration-300 ease-out hover:bg-white/10 hover:backdrop-blur-[5px] focus-visible:bg-white/10 focus-visible:backdrop-blur-[5px] focus-visible:outline-none light:hover:bg-ink/5 light:focus-visible:bg-ink/5 motion-reduce:transition-none";
+
+const navLinkOpen =
+  "group-hover/dropdown:bg-white/10 group-hover/dropdown:backdrop-blur-[5px] group-focus-within/dropdown:bg-white/10 group-focus-within/dropdown:backdrop-blur-[5px] light:group-hover/dropdown:bg-ink/5 light:group-focus-within/dropdown:bg-ink/5";
+
+const panelRow =
+  "block rounded-lg transition-colors duration-200 ease-out hover:bg-[#000a22]/5 focus-visible:bg-[#000a22]/5 focus-visible:outline-none motion-reduce:transition-none";
+---
+
+<header
+  data-header
+  class="group/header fixed inset-x-0 top-0 z-50 isolate text-white light:text-ink data-[menu-open]:bg-ink data-[menu-open]:light:bg-white data-[menu-open]:text-white data-[menu-open]:light:text-ink before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:-z-[1] before:box-content before:h-full before:pb-[10%] before:bg-linear-to-b before:from-[#000a22] before:to-[#000a2200] before:opacity-0 before:transition-opacity before:duration-300 before:ease-out before:content-[''] before:light:from-white before:light:to-[#ffffff00] data-[scrolled]:before:opacity-40 data-[menu-open]:before:hidden motion-reduce:before:transition-none"
+>
+  <div
+    class="container relative z-10 grid h-[var(--header-height)] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4"
+  >
+    <!-- Logo -->
+    <a href="/" class="col-start-1 flex items-center justify-self-start">
+      <img
+        src="/brand.png"
+        alt="MyBrand"
+        width="140"
+        height="40"
+        class="h-8 w-auto light:brightness-0"
+      />
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav
+      class="col-start-2 hidden items-center justify-center gap-2 text-sm min-[992px]:flex"
+      aria-label="Primary navigation"
+    >
+      {primary.map((item) => {
+        const children = visibleChildren(item.children);
+        const hasChildren = children.length > 0;
+        const showPanel = hasChildren && isPanelParent(item.url);
+
+        return hasChildren ? (
+          <div
+            class:list={["group/dropdown", !showPanel && "relative"]}
+            data-nav-dropdown
+          >
+            <a
+              href={item.url}
+              class:list={[
+                navLinkBase,
+                navLinkOpen,
+                "flex items-center gap-1.5",
+              ]}
+              aria-haspopup="true"
+            >
+              {item.label}
+              <svg
+                width="12"
+                height="7"
+                viewBox="0 0 12 7"
+                fill="none"
+                aria-hidden="true"
+                class="shrink-0 transition-transform duration-300 group-hover/dropdown:rotate-180 group-focus-within/dropdown:rotate-180 motion-reduce:transition-none"
+              >
+                <path
+                  d="M1 1.25l5 5 5-5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+
+            {showPanel ? (
+              <div
+                role="group"
+                aria-label={`${item.label} submenu`}
+                class="invisible absolute left-1/2 top-full z-20 flex w-[min(950px,calc(100vw-2rem))] -translate-x-1/2 translate-y-2 items-start gap-6 rounded-md bg-white p-6 text-slate-900 opacity-0 shadow-[0_32px_80px_-16px_rgba(0,10,34,0.45)] transition-[opacity,transform,visibility] duration-300 ease-out group-hover/dropdown:visible group-hover/dropdown:translate-y-0 group-hover/dropdown:opacity-100 group-focus-within/dropdown:visible group-focus-within/dropdown:translate-y-0 group-focus-within/dropdown:opacity-100 motion-reduce:transition-none"
+              >
+                <div class="grid flex-1 grid-cols-2 content-start gap-x-6 gap-y-2">
+                  {children.map((child) => (
+                    <a
+                      href={child.url}
+                      class="text-base font-medium tracking-tight text-slate-900 transition-colors hover:text-orange-500"
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+
+                {details.menuImage && (
+                  <div
+                    class="w-[clamp(200px,30vw,280px)] shrink-0 overflow-hidden rounded-sm bg-slate-100"
+                    aria-hidden="true"
+                  >
+                    <Image
+                      src={details.menuImage}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      class="aspect-[324/377] size-full object-cover object-center"
+                    />
+                    
+                  </div>
+                )}
+              </div>
+            ) : (
+              <ul
+                class="invisible absolute left-0 top-full z-20 min-w-44 translate-y-2 rounded-xl bg-white p-2 pt-3 text-slate-900 opacity-0 shadow-xl transition-[opacity,transform,visibility] duration-300 group-hover/dropdown:visible group-hover/dropdown:translate-y-0 group-hover/dropdown:opacity-100 group-focus-within/dropdown:visible group-focus-within/dropdown:translate-y-0 group-focus-within/dropdown:opacity-100 motion-reduce:transition-none"
+                role="group"
+                aria-label={`${item.label} submenu`}
+              >
+                {children.map((child) => (
+                  <li>
+                    <a
+                      href={child.url}
+                      class:list={[
+                        panelRow,
+                        "px-4 py-3 text-sm font-semibold text-slate-900",
+                      ]}
+                    >
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ) : (
+          <a href={item.url} class={navLinkBase}>
+            {item.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Actions -->
+    <div class="col-start-3 flex items-center justify-end gap-2 justify-self-end">
+
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with us on WhatsApp"
+        class="flex size-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.964 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.098-.346-.1-.149-.446-1.102-.616-1.51-.165-.33-.33-.28-.446-.28h-.4c-.132 0-.346.05-.529.247-.181.197-.692.677-.692 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.257.84.41 1.128.527.474.149.907.085 1.25-.05.38-.148 1.17-.479 1.337-.94.165-.46.165-.855.115-.94-.05-.084-.18-.132-.38-.23z"
+          />
+        </svg>
+      </a>
+
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        aria-label="Open menu"
+        class="relative flex size-8 shrink-0 cursor-pointer items-center justify-center min-[992px]:hidden"
+      >
+        <span class="absolute left-0 top-1/2 h-px w-8 -translate-y-1 transition-transform group-data-[menu-open]/header:translate-y-0 group-data-[menu-open]/header:rotate-45 motion-reduce:transition-none bg-current"></span>
+        <span class="absolute left-0 top-1/2 h-px w-8 translate-y-1 transition-transform group-data-[menu-open]/header:translate-y-0 group-data-[menu-open]/header:-rotate-45 motion-reduce:transition-none bg-current"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile navigation -->
+  <div
+    id="mobile-nav"
+    data-mobile-nav
+    class="invisible pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] -translate-y-full overflow-y-auto bg-slate-950 pt-[var(--header-height)] text-white transition-[transform,visibility] duration-500 ease-out group-data-[menu-open]/header:visible group-data-[menu-open]/header:pointer-events-auto group-data-[menu-open]/header:translate-y-0 min-[992px]:hidden motion-reduce:transition-none light:bg-white light:text-slate-900"
+  >
+    <nav
+      class="container relative z-10 flex flex-col pb-6 pt-4 text-sm"
+      aria-label="Mobile navigation"
+    >
+      {primary.map((item, index) => {
+        const children = visibleChildren(item.children);
+        const hasChildren = children.length > 0;
+        const panelId = `mobile-submenu-${index}`;
+
+        return (
+          <div
+            class="border-t border-white/10 first:border-t-0 light:border-slate-200"
+            data-mobile-group
+          >
+            <div class="flex items-center justify-between gap-4">
+              <a href={item.url} class="flex-1 py-4">
+                {item.label}
+              </a>
+
+              {hasChildren && (
+                <button
+                  type="button"
+                  data-mobile-submenu-toggle
+                  aria-expanded="false"
+                  aria-controls={panelId}
+                  aria-label={`Show ${item.label} submenu`}
+                  class="flex size-11 shrink-0 cursor-pointer items-center justify-center"
+                >
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    aria-hidden="true"
+                    class="transition-transform duration-300 motion-reduce:transition-none"
+                  >
+                    <path
+                      d="M1 1.25l5 5 5-5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {hasChildren && (
+              <div id={panelId} data-mobile-submenu hidden class="pb-3 pl-4">
+                {children.map((child) => (
+                  <a
+                    href={child.url}
+                    class="block py-3 text-white/70 transition-colors hover:text-orange-400 light:text-slate-600"
+                  >
+                    {child.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  </div>
+
+  <!-- Desktop dropdown overlay -->
+  <div
+    data-desktop-scrim
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-0 hidden h-[calc(100svh-var(--header-height))] bg-[#010514]/50 opacity-0 transition-opacity duration-300 group-has-[[data-nav-dropdown]:hover]/header:opacity-100 group-has-[[data-nav-dropdown]:focus-within]/header:opacity-100 min-[992px]:block motion-reduce:transition-none"
+  ></div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+
+  if (header) {
+    const menuToggle = header.querySelector<HTMLButtonElement>(
+      "[data-menu-toggle]"
+    );
+
+    const mobileNav = header.querySelector<HTMLElement>("[data-mobile-nav]");
+
+    const closeMobileMenu = () => {
+      header.removeAttribute("data-menu-open");
+      menuToggle?.setAttribute("aria-expanded", "false");
+      menuToggle?.setAttribute("aria-label", "Open menu");
+
+      header
+        .querySelectorAll<HTMLButtonElement>("[data-mobile-submenu-toggle]")
+        .forEach((button) => {
+          button.setAttribute("aria-expanded", "false");
+
+          const id = button.getAttribute("aria-controls");
+          const panel = id ? document.getElementById(id) : null;
+
+          if (panel) panel.hidden = true;
+        });
+    };
+
+    menuToggle?.addEventListener("click", () => {
+      const isOpen = header.hasAttribute("data-menu-open");
+
+      if (isOpen) {
+        closeMobileMenu();
+      } else {
+        header.setAttribute("data-menu-open", "");
+        menuToggle.setAttribute("aria-expanded", "true");
+        menuToggle.setAttribute("aria-label", "Close menu");
+      }
+    });
+
+    header
+      .querySelectorAll<HTMLButtonElement>("[data-mobile-submenu-toggle]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const expanded = button.getAttribute("aria-expanded") === "true";
+          const id = button.getAttribute("aria-controls");
+          const panel = id ? document.getElementById(id) : null;
+
+          button.setAttribute("aria-expanded", String(!expanded));
+
+          if (panel) panel.hidden = expanded;
+        });
+      });
+
+    mobileNav?.querySelectorAll<HTMLAnchorElement>("a").forEach((link) => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMobileMenu();
+    });
+
+    let lastScrollY = 0;
+
+    const updateHeader = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > 20) {
+        header.setAttribute("data-scrolled", "");
+      } else {
+        header.removeAttribute("data-scrolled");
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    updateHeader();
+  }
+</script>
+
+<style>
+  [data-mobile-submenu-toggle][aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  [data-mobile-submenu]:not([hidden]) {
+    display: block;
+  }
+</style>

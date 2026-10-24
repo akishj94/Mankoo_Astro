@@ -1,0 +1,31 @@
+
+---
+import Layout from "../layouts/Layout.astro";
+import SplitGrid from '../components/blocks/SplitGrid.astro';
+import TeamGrid from '../components/blocks/TeamGrid.astro';
+import TimelineSlider from '../components/blocks/TimelineSlider.astro';
+import CTA from '../components/blocks/CTA.astro';
+import PageIntro from '../components/blocks/PageIntro.astro';
+import VideoBlock from '../components/blocks/VideoBlock.astro';
+
+---
+
+<Layout
+  title="Home | Mankoo"
+  description="Explore dependable construction machinery, equipment, company information, and industry news.">
+    <PageIntro
+    eyebrow="About Us"
+    title="Since 1974" content={`
+A leading and dedicated Power Presses manufacturing company committed to build long-lasting relationships with local and international business clients. The Mankoo Presses INDIA is a trusted name among the top rated suppliers of power press machines in UAE, Egypt, Iran, Mexico, Saudi Arabia and Middle East countries`}
+    headingLevel="h1"
+    />
+<VideoBlock
+  src="/landing.mp4"
+  aspectRatio="21 / 9"
+/>
+ <SplitGrid />
+ <TeamGrid />
+ <TimelineSlider />
+ <CTA />
+
+</Layout>

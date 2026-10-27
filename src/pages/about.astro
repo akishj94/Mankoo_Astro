@@ -7,12 +7,33 @@ import TimelineSlider from '../components/blocks/TimelineSlider.astro';
 import CTA from '../components/blocks/CTA.astro';
 import PageIntro from '../components/blocks/PageIntro.astro';
 import VideoBlock from '../components/blocks/VideoBlock.astro';
+import { sanityClient } from 'sanity:client';
+import { siteSettingsQuery } from "../lib/queries";
 
+// AI-generated: Fetch site settings for default SEO fallback
+const settings = await sanityClient.fetch(siteSettingsQuery);
+const defaultSeo = settings?.defaultSeo ?? {};
+
+// AI-generated: Read all SEO properties with fallback to defaults
+const seoTitle = defaultSeo.metaTitle;
+const seoDescription = defaultSeo.metaDescription || "";
+const canonicalUrl = defaultSeo.canonicalUrl || "/about";
 ---
 
 <Layout
-  title="Home | Mankoo"
-  description="Explore dependable construction machinery, equipment, company information, and industry news.">
+  title={seoTitle}
+  description={seoDescription}
+  // AI-generated: Pass all SEO properties to the layout
+  canonical={defaultSeo.canonicalUrl || undefined}
+  noindex={defaultSeo.noIndex ?? undefined}
+  ogTitle={defaultSeo.ogTitle ?? undefined}
+  ogDescription={defaultSeo.ogDescription ?? undefined}
+  ogImage={
+    defaultSeo.ogImage?.url
+      ? { url: defaultSeo.ogImage.url, alt: defaultSeo.ogImage.alt }
+      : undefined
+  }
+>
     <PageIntro
     eyebrow="About Us"
     title="Since 1974" content={`

@@ -30,11 +30,25 @@ export const siteSettings = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "logoAlt",
+      title: "Logo Alt Text",
+      type: "string",
+      group: "identity",
+      initialValue: "Mankoo Presses",
+    }),
+    defineField({
       name: "footerLogo",
       title: "Footer Logo",
       type: "image",
       options: { hotspot: true },
       group: "identity",
+    }),
+    defineField({
+      name: "FooterlogoAlt",
+      title: "Footer Logo Alt Text",
+      type: "string",
+      group: "identity",
+      initialValue: "Mankoo Presses",
     }),
     defineField({
       name: "favicon",
@@ -126,8 +140,6 @@ defineField({
                     { type: "page" },
                     { type: "product" },
                     { type: "post" },
-                    { type: "productCategory" },
-                    { type: "blogCategory" },
                   ],
                   hidden: ({ parent }) =>
                     parent?.linkType !== "internal",

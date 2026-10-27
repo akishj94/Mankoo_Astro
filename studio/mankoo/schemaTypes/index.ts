@@ -1,6 +1,7 @@
 
 import { seo } from "./objects/seo";
 import { navigationItem } from "./objects/navigationItem";
+import { productSpecifications } from './objects/productSpecifications';
 import {
   cta,
   specification,
@@ -9,10 +10,10 @@ import {
   imageTextSection,
   featureGridSection,
   productGridSection,
-  faqSection,
   gallerySection,
   ctaBannerSection,
   pageSections,
+  splitGridSection
 } from "./objects/pageSections";
 
 import { siteSettings } from "./documents/siteSettings";
@@ -20,7 +21,7 @@ import { page } from "./documents/page";
 import { product } from "./documents/product";
 
 import { post } from "./documents/post";
-import { productCategory } from "./documents/productCategory";
+// import { productCategory } from "./documents/productCategory";
 import { blogCategory } from "./documents/blogCategory";
 
 import { redirect } from "./documents/redirect";
@@ -38,18 +39,18 @@ export const schemaTypes = [
   imageTextSection,
   featureGridSection,
   productGridSection,
-  faqSection,
   gallerySection,
   ctaBannerSection,
   pageSections,
-  
-  
+  splitGridSection,
+  productSpecifications,
+
   // Documents
   siteSettings,
   page,
   product,
   post,
-  productCategory,
+  // productCategory,
   blogCategory,
   redirect,
 ];

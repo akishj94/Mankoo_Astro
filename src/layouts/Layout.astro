@@ -6,11 +6,24 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+
+  /* -- Product page SEO extensions (optional, additive) -- */
+  canonical?: string;
+  noindex?: boolean;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: { url?: string; alt?: string };
+  /* -- end Product page SEO extensions -- */
 }
 
 const {
-  title = "MyBrand | Industrial Machines",
-  description = "Explore our industrial machines, company information, and latest news.",
+  title,
+  description,
+  canonical,
+  noindex,
+  ogTitle,
+  ogDescription,
+  ogImage,
 } = Astro.props;
 ---
 
@@ -23,6 +36,23 @@ const {
     <meta name="theme-color" content="#ffffff" />
 
     <title>{title}</title>
+
+    {/* -- Product page SEO extensions (optional, additive) -- */}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    {ogTitle && <meta property="og:title" content={ogTitle} />}
+    {ogDescription && (
+      <meta property="og:description" content={ogDescription} />
+    )}
+    {ogImage?.url && (
+      <>
+        <meta property="og:image" content={ogImage.url} />
+        {ogImage.alt && (
+          <meta property="og:image:alt" content={ogImage.alt} />
+        )}
+      </>
+    )}
+    {/* -- end Product page SEO extensions -- */}
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>

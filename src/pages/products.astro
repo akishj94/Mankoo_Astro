@@ -1,0 +1,183 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Pagination from "../components/blocks/Pagination.astro";
+import { sanityClient } from "sanity:client";
+import {
+  productsListingPageQuery,
+  productsCountQuery,
+  paginatedProductsQuery,
+} from "../lib/queries";
+
+const DEFAULT_PRODUCTS_PER_PAGE = 12;
+
+// Fetch listing page content and total published product count.
+const [listingPage, totalProducts] = await Promise.all([
+  sanityClient.fetch(productsListingPageQuery),
+  sanityClient.fetch<number>(productsCountQuery),
+]);
+
+// Use the configured page size, with a safe fallback.
+const configuredPageSize = Number(listingPage?.itemsPerPage);
+const PRODUCTS_PER_PAGE =
+  Number.isInteger(configuredPageSize) && configuredPageSize > 0
+    ? configuredPageSize
+    : DEFAULT_PRODUCTS_PER_PAGE;
+
+const totalPages = Math.max(
+  1,
+  Math.ceil(totalProducts / PRODUCTS_PER_PAGE)
+);
+
+const requested = Number.parseInt(
+  Astro.url.searchParams.get("page") ?? "1",
+  10
+);
+
+const page = Math.min(
+  Math.max(Number.isNaN(requested) ? 1 : requested, 1),
+  totalPages
+);
+
+// Fetch only the products needed for the current page.
+const pageProducts = await sanityClient.fetch(paginatedProductsQuery, {
+  start: (page - 1) * PRODUCTS_PER_PAGE,
+  end: page * PRODUCTS_PER_PAGE,
+});
+
+const pageUrl = (target: number) =>
+  target <= 1 ? "/products" : `/products?page=${target}`;
+
+// SEO: prefer page-specific values, then use site defaults.
+const seoTitle =
+  listingPage?.seo?.metaTitle ||
+  listingPage?.listingTitle ||
+  listingPage?.title ||
+  "Our Products";
+
+const seoDescription =
+  listingPage?.seo?.metaDescription ||
+  listingPage?.listingDescription ||
+  "";
+
+const canonical =
+  listingPage?.seo?.canonicalUrl || "/products";
+
+const listingTitle =
+  listingPage?.listingTitle || listingPage?.title || "Our Products";
+
+const listingDescription = listingPage?.listingDescription;
+const eyebrow = 'Machines';
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDescription}
+  canonical={canonical}
+>
+  <section data-page-intro class="text-white border-b-2 border-[#242B3C]">
+  <div
+    class="container pb-[clamp(2rem,3vw,4rem)] pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem))]"
+  >
+    <div
+      class="grid grid-cols-1 gap-y-10 lg:grid-cols-[minmax(0,42%)_minmax(0,min(26%,_30rem))] lg:items-end lg:gap-[clamp(4rem,24vw,34rem)] md:justify-between lg:justify-normal"
+    >
+      <div class="min-w-0" data-reveal>
+        {eyebrow && (
+          <p class="text-[12px] uppercase tracking-[0.2em] text-accent">
+            {eyebrow}
+          </p>
+        )}
+
+        {listingTitle && (
+          <h1
+            class:list={[
+              'max-w-[11em] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]',
+              eyebrow && 'mt-6',
+            ]}
+          >
+            {listingTitle}
+          </h1>
+        )}
+      </div>
+
+     {listingDescription && (
+        <div class="min-w-0" data-reveal>
+            <p
+            data-reveal
+            class="mt-5 max-w-2xl text-lg text-white/60 leading-relaxed"
+          >
+            {listingDescription}
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+  <section class="container pt-16 pb-24">
+
+    {totalProducts === 0 ? (
+      <div class="py-16 text-center">
+        <h2 class="text-2xl font-medium text-ink">
+          No products available
+        </h2>
+
+        <p class="mt-4 text-ink/60">
+          No products have been published yet. Please check back soon.
+        </p>
+      </div>
+    ) : (
+      <>
+        <div
+          class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3 lg:grid-cols-4"
+        >
+          {pageProducts.map((product) => (
+            <div class="group" key={product.slug}>
+              <a
+                href={`/product/${product.slug}`}
+                class="group/post block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                aria-label={`View ${product.name}`}
+              >
+                {product.cover_image && (
+                  <figure class="relative aspect-[4/5] flex items-center w-full overflow-hidden bg-neutral-100">
+                    <img
+                      src={product.cover_image}
+                      alt={product.cover_alt || product.name}
+                      width={800}
+                      height={800}
+                      loading="lazy"
+                      decoding="async"
+                      class="size-full transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/post:scale-110 group-focus-visible/post:scale-110"
+                    />
+                  </figure>
+                )}
+
+                <h2
+                  class="mt-5 text-[20px] tracking-tight text-white transition-colors group-hover:text-accent"
+                >
+                  {product.name}
+                </h2>
+
+                {product.shortDescription && (
+                  <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-white/50">
+                    {product.shortDescription}
+                  </p>
+                )}
+              </a>
+            </div>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <nav class="mt-16" aria-label="Product pagination">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              getHref={pageUrl}
+            />
+          </nav>
+        )}
+      </>
+    )}
+  </section>
+</Layout>

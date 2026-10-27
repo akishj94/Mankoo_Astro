@@ -36,8 +36,6 @@ export const navigationItem = defineType({
         {type: 'page'},
         {type: 'product'},
         {type: 'post'},
-        {type: 'productCategory'},
-        {type: 'blogCategory'},
       ],
       hidden: ({parent}) => parent?.linkType !== 'internal',
       validation: (Rule) =>

@@ -30,15 +30,15 @@ export const page = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-  name: 'isHomepage',
-  title: 'Homepage',
-  type: 'boolean',
-  initialValue: false,
-  validation: (rule) =>
-    rule.custom(async (isHomepage, context) => {
-      if (isHomepage !== true) {
-        return true
-      }
+      name: 'isHomepage',
+      title: 'Homepage',
+      type: 'boolean',
+      initialValue: false,
+      validation: (rule) =>
+      rule.custom(async (isHomepage, context) => {
+        if (isHomepage !== true) {
+          return true
+        }
 
       const {document, getClient} = context
 
@@ -75,6 +75,72 @@ export const page = defineType({
       title: "Page Sections",
       type: "pageSections",
       group: "content",
+      readOnly: ({ document }) =>
+      ["productsListing", "blogListing"].includes(
+        document?.pageType as string
+      ),
+    }),
+    defineField({
+      name: "pageType",
+      title: "Page Type",
+      type: "string",
+      options: {
+        list: [
+          { title: "Standard Page", value: "standard" },
+          { title: "Products Listing Page", value: "productsListing" },
+          { title: "Blog Listing Page", value: "blogListing" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "standard",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "listingTitle",
+      title: "Listing Title",
+      type: "string",
+      description: "The heading displayed above the product or blog listing.",
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const pageType = (context.document as { pageType?: string })
+            ?.pageType;
+
+          if (
+            ["productsListing", "blogListing"].includes(pageType ?? "") &&
+            !value?.trim()
+          ) {
+            return "Listing title is required for listing pages.";
+          }
+
+          return true;
+        }),
+      hidden: ({ document }) =>
+        !["productsListing", "blogListing"].includes(
+          document?.pageType as string
+        ),
+    }),
+    defineField({
+      name: "listingDescription",
+      title: "Listing Description",
+      type: "text",
+      rows: 3,
+      description: "Introductory description displayed above the listing.",
+      hidden: ({ document }) =>
+        !["productsListing", "blogListing"].includes(
+          document?.pageType as string
+        ),
+    }),
+
+    defineField({
+      name: "itemsPerPage",
+      title: "Items Per Page",
+      type: "number",
+      initialValue: 12,
+      validation: (Rule) => Rule.required().integer().min(1).max(100),
+      hidden: ({ document }) =>
+        !["productsListing", "blogListing"].includes(
+          document?.pageType as string
+        ),
     }),
     defineField({
       name: "seo",

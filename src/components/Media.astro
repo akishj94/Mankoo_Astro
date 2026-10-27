@@ -1,0 +1,51 @@
+--- 
+interface Props {
+  image: string | null;
+  alt: string;
+  ratio: string;
+  widths: number[];
+  sizes: string;
+  loading?: string;
+  decoding?: string;
+  class?: string;
+  mediaClass?: string;
+}
+
+const { image, alt, ratio, widths, sizes, loading = 'lazy', decoding = 'async', class: cls, mediaClass } = Astro.props;
+
+if (!image) {
+  return <div className={cls || 'bg-neutral-100 h-[200px] w-full'} />;
+}
+
+const ratioParts = ratio.split('/');
+const baseWidth = 800;
+const baseHeight = (Number(ratioParts[1]) / Number(ratioParts[0])) * baseWidth;
+
+// Generate srcset from widths
+const srcset = widths
+  .filter((w) => w <= baseWidth * 2)
+  .map((w) => {
+    const ratioHeight = (Number(ratioParts[1]) / Number(ratioParts[0])) * w;
+    return `${image} ${w}w`;
+  })
+  .join(', ');
+
+return (
+  <a
+    href={`/products/${alt}`}
+    class={cls || ''}
+  >
+    <img
+      src={image}
+      alt={alt}
+      width={baseWidth}
+      height={Math.round(baseHeight)}
+      loading={loading}
+      decoding={decoding}
+      className={mediaClass || 'w-full h-auto object-cover'}
+      srcSet={srcset}
+      sizes={sizes}
+    />
+  </a>
+);
+---

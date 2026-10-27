@@ -15,6 +15,6 @@ export default defineConfig({
       projectId: 'jsvhl0m3',
       dataset: 'production',
       apiVersion: '2026-10-26',
-      useCdn: true,
+      useCdn: false,
   }),]
 });

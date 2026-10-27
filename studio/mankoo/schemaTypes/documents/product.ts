@@ -28,20 +28,20 @@ export const product = defineType({
       options: { source: "name", maxLength: 96 },
       validation: (Rule) => Rule.required(),
     }),
-    defineField({
-      name: "modelNumber",
-      title: "Model Number",
-      type: "string",
-      group: "basic",
-    }),
-    defineField({
-      name: "category",
-      title: "Product Category",
-      type: "reference",
-      to: [{ type: "productCategory" }],
-      group: "basic",
-      validation: (Rule) => Rule.required(),
-    }),    
+    // defineField({
+    //   name: "modelNumber",
+    //   title: "Model Number",
+    //   type: "string",
+    //   group: "basic",
+    // }),
+    // defineField({
+    //   name: "category",
+    //   title: "Product Category",
+    //   type: "reference",
+    //   to: [{ type: "productCategory" }],
+    //   group: "basic",
+    //   validation: (Rule) => Rule.required(),
+    // }),    
     defineField({
       name: "shortDescription",
       title: "Short Description",
@@ -64,26 +64,26 @@ export const product = defineType({
         }),
       ],
     }),
-    defineField({
-      name: "gallery",
-      title: "Product Gallery",
-      type: "array",
-      of: [
-        {
-          type: "image",
-          options: { hotspot: true },
-          fields: [
-            defineField({ name: "alt", title: "Alt Text", type: "string" }),
-            defineField({
-              name: "caption",
-              title: "Caption",
-              type: "string",
-            }),
-          ],
-        },
-      ],
-      group: "details",
-    }),
+    // defineField({
+    //   name: "gallery",
+    //   title: "Product Gallery",
+    //   type: "array",
+    //   of: [
+    //     {
+    //       type: "image",
+    //       options: { hotspot: true },
+    //       fields: [
+    //         defineField({ name: "alt", title: "Alt Text", type: "string" }),
+    //         defineField({
+    //           name: "caption",
+    //           title: "Caption",
+    //           type: "string",
+    //         }),
+    //       ],
+    //     },
+    //   ],
+    //   group: "details",
+    // }),
     defineField({
       name: "description",
       title: "Full Description",
@@ -91,32 +91,37 @@ export const product = defineType({
       of: [{ type: "block" }, { type: "image", options: { hotspot: true } }],
       group: "details",
     }),
-    defineField({
-      name: "features",
-      title: "Key Features",
-      type: "array",
-      of: [{ type: "string" }],
-      group: "details",
-    }),
-    defineField({
-      name: "applications",
-      title: "Applications",
-      type: "array",
-      of: [{ type: "string" }],
-      group: "details",
-    }),
+    // defineField({
+    //   name: "features",
+    //   title: "Key Features",
+    //   type: "array",
+    //   of: [{ type: "string" }],
+    //   group: "details",
+    // }),
+    // defineField({
+    //   name: "applications",
+    //   title: "Applications",
+    //   type: "array",
+    //   of: [{ type: "string" }],
+    //   group: "details",
+    // }),
     defineField({
       name: "specifications",
       title: "Technical Specifications",
-      type: "array",
-      of: [{ type: "specification" }],
+      type: "productSpecifications",
       group: "technical",
     }),
     defineField({
-      name: "brochure",
-      title: "Product Brochure",
-      type: "file",
-      options: { accept: ".pdf" },
+      name: "brochures",
+      title: "Product Brochures",
+      type: "array",
+      of: [
+        {
+          type: "file",
+          options: { accept: ".pdf" },
+        },
+      ],
+      validation: (Rule) => Rule.max(2),
       group: "details",
     }),
     defineField({

@@ -1,7 +1,29 @@
 ---
-import { Image } from 'astro:assets';
-import smallImage from '../../assets/IMG_202.jpg';
-import largeImage from '../../assets/IMG_202.jpg';
+const { section } = Astro.props;
+
+const smallImageUrl = section?.smallImage?.asset?.url;
+const largeImageUrl = section?.largeImage?.asset?.url;
+
+const introText =
+  section?.introText ?? 'N/A';
+
+const highlightText =
+  section?.highlightText ?? 'N/A';
+
+const statistic = section?.statistic ?? 'N/A';
+const statisticLabel =
+  section?.statisticLabel ?? 'N/A';
+  
+const link = section?.link;
+const isExternal = link?.linkType === "external";
+
+const internalHref = link?.href
+  ? `/${link.href.replace(/^\/+/, "")}`
+  : undefined;
+
+const ctaHref = isExternal ? link?.url : internalHref;
+const openInNewTab = Boolean(link?.openInNewTab);
+const ctaLabel = link?.label || "Discover";
 ---
 
 <section
@@ -10,68 +32,66 @@ import largeImage from '../../assets/IMG_202.jpg';
 >
   <div class="container grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
     <div class="grid grid-cols-[61fr_39fr]" data-reveal>
-      <div class="col-start-2 row-start-1 aspect-[5/6] overflow-hidden bg-neutral-900">
-        <Image
-          src={smallImage}
-          alt="Small featured image"
-          width={640}
-          height={500}
-          sizes="(min-width: 1024px) 20vw, 100vw"
-          loading="lazy"
-          decoding="async"
-          class="size-full object-cover"
-        />
-      </div>
+      {smallImageUrl && (
+        <div class="col-start-2 row-start-1 aspect-[5/6] overflow-hidden bg-neutral-900">
+          <img
+            src={smallImageUrl}
+            alt={section.smallImage?.alt ?? ''}
+            width="640"
+            height="500"
+            sizes="(min-width: 1024px) 20vw, 100vw"
+            loading="lazy"
+            decoding="async"
+            class="size-full !object-cover object-center"
+          />
+        </div>
+      )}
 
-      <div class="col-start-1 row-start-2 aspect-[5/6] overflow-hidden bg-neutral-900">
-        <Image
-          src={largeImage}
-          alt="Large featured image"
-          width={500}
-          height={690}
-          sizes="(min-width: 1024px) 30vw, 100vw"
-          loading="lazy"
-          decoding="async"
-          class="size-full object-cover"
-        />
-      </div>
+      {largeImageUrl && (
+        <div class="relative col-start-1 row-start-2 aspect-[5/6] overflow-hidden bg-neutral-900">
+          <img
+            src={largeImageUrl}
+            alt={section.largeImage?.alt ?? ""}
+            width="500"
+            height="690"
+            sizes="(min-width: 1024px) 30vw, 100vw"
+            loading="lazy"
+            decoding="async"
+            class="absolute inset-0 block !size-full object-cover  object-center"
+          />
+        </div>
+      )}
     </div>
 
-    <div data-reveal class="md:w-[90%] lg:w-[70%] m-auto">
+    <div data-reveal class="m-auto md:w-[90%] lg:w-[70%]">
       <p class="text-[clamp(1.25rem,1.6vw,1.6rem)] leading-snug">
-        MANKOO INDIA is a leading and dedicated Power Press Manufacturer [Since 1974] in Ludhiana-India, and committed to build long-lasting relationships with local and international business clients.
-        <span class="text-[#7C7C7C]">
-          The company is ISO 9001:2015 certified & trusted in the nation for their excellence in making efficient power presses for different industries.
-        </span>
+        {introText}
+        {highlightText && (
+          <span class="text-[#7C7C7C]">
+            {' '}{highlightText}
+          </span>
+        )}
       </p>
 
       <div class="mt-12 flex flex-wrap items-end justify-between gap-10">
         <div>
-          <span class="text-6xl">50+</span>
-          <p class="mt-1 text-xs uppercase leading-snug tracking-[0.12em] max-w-[50%]">
-            YEARS IN POWER PRESSES
+          <span class="text-6xl">{statistic}</span>
+          <p class="mt-1 max-w-[50%] text-xs uppercase leading-snug tracking-[0.12em]">
+            {statisticLabel}
           </p>
         </div>
 
-        <a
-          href="/about"
-          class="inline-flex min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] px-4 py-4 text-[15px] md:text-[16px] text-white backdrop-blur-[5px] transition-all duration-250 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink bg-[rgba(246,246,246,0.2)] md:hover:bg-[rgba(246,246,246,0.35)] light:md:bg-ink light:md:hover:bg-ink/85 light:md:hover:bg-ink/85 aspect-[6/3] leading-[1.2]"
-        >
-          <span>
-            More About our story
-          </span>
-
-          <svg
-            width="15"
-            height="24"
-            class="h-4 w-[15px] shrink-0"
-            viewBox="0 -960 960 960"
-            fill="currentColor"
-            aria-hidden="true"
+       {ctaHref && (
+          <a
+            href={ctaHref}
+            target={openInNewTab ? "_blank" : undefined}
+            rel={openInNewTab ? "noopener noreferrer" : undefined}
+            class="inline-flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] bg-[rgba(246,246,246,0.2)] px-4 py-4 text-[15px] leading-[1.2] text-white backdrop-blur-[5px] transition-all duration-250 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[16px] md:hover:bg-[rgba(246,246,246,0.35)] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
           >
-            <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
-          </svg>
-        </a>
+            <span class="md:max-w-[60%]">{ctaLabel}</span>
+            <!-- Keep your existing arrow SVG here -->
+          </a>
+        )}
       </div>
     </div>
   </div>

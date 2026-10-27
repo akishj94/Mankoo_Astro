@@ -1,4 +1,3 @@
-
 ---
 import Layout from "../layouts/Layout.astro";
 import Hero from '../components/blocks/Hero.astro';
@@ -9,15 +8,52 @@ import GridTabs from '../components/blocks/GridTabs.astro';
 import Testimonial from '../components/blocks/Testimonial.astro';
 import StepGrid from '../components/blocks/StepGrid.astro';
 import LatestPosts from '../components/blocks/LatestPosts.astro';
+import { sanityClient } from 'sanity:client';
+import { homepageQuery } from "../lib/queries";
 
+const page = await sanityClient.fetch(homepageQuery);
+
+const hero = page?.sections?.find(
+  (section) => section._type === "heroSection"
+);
+const splitGridSection = page?.sections?.find(
+  (section) => section._type === "splitGridSection"
+);
+// AI-generated: Read all SEO properties from the Sanity page document
+const seoTitle =
+  page?.seo?.metaTitle || page?.title || "Home | Mankoo";
+const seoDescription =
+  page?.seo?.metaDescription ||
+  page?.title ||
+  "";
+const canonicalUrl = page?.seo?.canonicalUrl || "/";
 ---
 
 <Layout
-  title="Home | Mankoo"
-  description="Explore dependable construction machinery, equipment, company information, and industry news."
+  title={seoTitle}
+  description={seoDescription}
+  // AI-generated: Pass all SEO properties to the layout
+  canonical={page?.seo?.canonicalUrl || undefined}
+  noindex={page?.seo?.noIndex ?? undefined}
+  ogTitle={page?.seo?.ogTitle ?? undefined}
+  ogDescription={page?.seo?.ogDescription ?? undefined}
+  ogImage={
+    page?.seo?.ogImage?.url
+      ? { url: page.seo.ogImage.url, alt: page.seo.ogImage.alt }
+      : undefined
+  }
 >
- <Hero />
- <SplitGrid />
+ {hero && (
+    <Hero
+      eyebrow={hero.eyebrow}
+      heading={hero.heading}
+      image={hero.image}
+      imageAlt={hero.imageAlt}
+      videoUrl={hero.videoUrl}
+      primaryCta={hero.primaryCta}
+    />
+  )}
+<SplitGrid section={splitGridSection} />
  <ProductCarousel />
  <GridTabs />
  <FeaturedProduct />

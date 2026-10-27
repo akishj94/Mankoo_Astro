@@ -2,8 +2,64 @@
 import { defineField, defineType } from "sanity";
 
 const linkFields = [
-  defineField({ name: "label", title: "Button Label", type: "string" }),
-  defineField({ name: "url", title: "Button URL", type: "string" }),
+  defineField({
+    name: "label",
+    title: "Button Label",
+    type: "string",
+    validation: (Rule) => Rule.required(),
+  }),
+
+  defineField({
+    name: "linkType",
+    title: "Link Type",
+    type: "string",
+    options: {
+      list: [
+        { title: "Internal Link", value: "internal" },
+        { title: "External URL", value: "external" },
+      ],
+      layout: "radio",
+    },
+    initialValue: "internal",
+    validation: (Rule) => Rule.required(),
+  }),
+
+  defineField({
+  name: "href",
+  title: "Internal Link",
+  type: "reference",
+  to: [
+    { type: "page" },
+    { type: "product" },
+    { type: "post" },
+  ],
+  hidden: ({ parent }) => parent?.linkType !== "internal",
+  validation: (Rule) =>
+    Rule.custom((value, context) => {
+      if (context.parent?.linkType === "internal" && !value) {
+        return "Select an internal destination.";
+      }
+      return true;
+    }),
+  }),
+
+  defineField({
+    name: "url",
+    title: "External URL",
+    type: "url",
+    hidden: ({ parent }) => parent?.linkType !== "external",
+    validation: (Rule) =>
+      Rule.custom((value, context) => {
+        const parent = context.parent;
+
+        if (parent?.linkType === "external" && !value) {
+          return "Enter an external URL.";
+        }
+
+        return true;
+      }),
+  }),
+
   defineField({
     name: "openInNewTab",
     title: "Open in new tab",
@@ -16,22 +72,103 @@ export const cta = defineType({
   name: "cta",
   title: "Call to Action",
   type: "object",
+  fields: [...linkFields],
+  preview: {
+    select: {
+      title: "label",
+      linkType: "linkType",
+      href: "href",
+      url: "url",
+    },
+    prepare({ title, linkType, href, url }) {
+      return {
+        title: title || "Call to Action",
+        subtitle:
+          linkType === "external"
+            ? url || "External URL"
+            : href || "Internal Link",
+      };
+    },
+  },
+});
+
+export const splitGridSection = defineType({
+  name: 'splitGridSection',
+  title: 'Split Grid Section',
+  type: 'object',
   fields: [
-    ...linkFields,
     defineField({
-      name: "style",
-      title: "Button Style",
-      type: "string",
-      options: {
-        list: [
-          { title: "Primary", value: "primary" },
-          { title: "Secondary", value: "secondary" },
-          { title: "Text Link", value: "link" },
-        ],
-      },
-      initialValue: "primary",
+      name: 'smallImage',
+      title: 'Small Image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative Text',
+          type: 'string',
+        }),
+      ],
     }),
+    defineField({
+      name: 'largeImage',
+      title: 'Large Image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative Text',
+          type: 'string',
+        }),
+      ],
+    }),
+    defineField({
+      name: 'introText',
+      title: 'Introductory Text',
+      type: 'text',
+      rows: 3,
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'highlightText',
+      title: 'Highlighted Text',
+      description: 'The muted text that follows the introductory text.',
+      type: 'text',
+      rows: 3,
+    }),
+    defineField({
+      name: 'statistic',
+      title: 'Statistic',
+      type: 'string',
+      initialValue: '50+',
+    }),
+    defineField({
+      name: 'statisticLabel',
+      title: 'Statistic Label',
+      type: 'string',
+      initialValue: 'YEARS IN POWER PRESSES',
+    }),
+    
+    defineField({
+      name: "link",
+      title: "Link",
+      type: "cta",
+    }),  
   ],
+  preview: {
+    select: {
+      title: 'introText',
+      media: 'largeImage',
+    },
+    prepare({ title, media }) {
+      return {
+        title: 'Split Grid Section',
+        subtitle: title,
+        media,
+      };
+    },
+  },
 });
 
 export const specification = defineType({
@@ -69,20 +206,29 @@ export const heroSection = defineType({
   fields: [
     defineField({
       name: "eyebrow",
-      title: "Eyebrow Text",
+      title: "SubTitle/ Eyebrow Text",
       type: "string",
     }),
     defineField({
       name: "heading",
       title: "Heading",
       type: "string",
-      validation: (Rule) => Rule.required(),
     }),
+    // defineField({
+    //   name: "description",
+    //   title: "Description",
+    //   type: "text",
+    //   rows: 3,
+    // }),
     defineField({
-      name: "description",
-      title: "Description",
-      type: "text",
-      rows: 3,
+      name: "video",
+      title: "Background Video",
+      type: "file",
+      options: {
+        accept: "video/mp4,video/webm",
+      },
+      description:
+        "Optional background video. If provided, it takes priority over the hero image.",
     }),
     defineField({
       name: "image",
@@ -97,28 +243,9 @@ export const heroSection = defineType({
     }),
     defineField({
       name: "primaryCta",
-      title: "Primary CTA",
+      title: "Call To Action",
       type: "cta",
-    }),
-    defineField({
-      name: "secondaryCta",
-      title: "Secondary CTA",
-      type: "cta",
-    }),
-    defineField({
-      name: "alignment",
-      title: "Content Alignment",
-      type: "string",
-      options: {
-        list: [
-          { title: "Left", value: "left" },
-          { title: "Center", value: "center" },
-          { title: "Right", value: "right" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "left",
-    }),
+    }),   
   ],
   preview: {
     select: { title: "heading", media: "image" },
@@ -302,54 +429,11 @@ export const productGridSection = defineType({
       hidden: ({ parent }) => parent?.selectionMode !== "manual",
     }),
     defineField({
-      name: "category",
-      title: "Product Category",
-      type: "reference",
-      to: [{ type: "productCategory" }],
-      hidden: ({ parent }) => parent?.selectionMode !== "category",
-    }),
-    defineField({
       name: "limit",
       title: "Maximum Products",
       type: "number",
       initialValue: 6,
       validation: (Rule) => Rule.min(1).max(24).integer(),
-    }),
-  ],
-});
-
-export const faqSection = defineType({
-  name: "faqSection",
-  title: "Frequently Asked Questions",
-  type: "object",
-  fields: [
-    defineField({ name: "heading", title: "Heading", type: "string" }),
-    defineField({
-      name: "items",
-      title: "Questions",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "faqItem",
-          fields: [
-            defineField({
-              name: "question",
-              title: "Question",
-              type: "string",
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: "answer",
-              title: "Answer",
-              type: "text",
-              rows: 4,
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
-          preview: { select: { title: "question" } },
-        },
-      ],
     }),
   ],
 });
@@ -411,8 +495,8 @@ export const pageSections = defineType({
     { type: "imageTextSection" },
     { type: "featureGridSection" },
     { type: "productGridSection" },
-    { type: "faqSection" },
     { type: "gallerySection" },
     { type: "ctaBannerSection" },
+    { type: "splitGridSection" },
   ],
 });

@@ -1,0 +1,623 @@
+---
+interface SpecificationRow {
+  _key?: string;
+  label?: string | null;
+  unit?: string | null;
+  value?: string | null;
+}
+
+interface SpecificationGroup {
+  _key?: string;
+  title?: string | null;
+  specifications?: SpecificationRow[] | null;
+}
+
+interface ModelConfiguration {
+  _key: string;
+  modelName?: string | null;
+  keySpecifications?: SpecificationRow[] | null;
+  specificationGroups?: SpecificationGroup[] | null;
+}
+
+interface Props {
+  specifications?: {
+    heading?: string | null;
+    subtitle?: string | null;
+    capacities?: ModelConfiguration[] | null;
+  } | null;
+}
+
+const { specifications } = Astro.props;
+
+const cleanText = (value?: string | null): string =>
+  typeof value === 'string' ? value.trim() : '';
+
+const cleanRows = (rows?: SpecificationRow[] | null) =>
+  (rows ?? [])
+    .filter(
+      (row) =>
+        row &&
+        (cleanText(row.label) ||
+          cleanText(row.value) ||
+          cleanText(row.unit)),
+    )
+    .map((row) => ({
+      _key: row._key,
+      label: cleanText(row.label) || 'N/A',
+      value: cleanText(row.value) || 'N/A',
+      unit: cleanText(row.unit),
+    }));
+
+const models = (specifications?.capacities ?? [])
+  .filter((model) => model && cleanText(model.modelName))
+  .map((model) => ({
+    _key: model._key,
+    modelName: cleanText(model.modelName),
+    keySpecifications: cleanRows(model.keySpecifications),
+    specificationGroups: (model.specificationGroups ?? [])
+      .filter(
+        (group) =>
+          group &&
+          (cleanText(group.title) ||
+            (group.specifications ?? []).some(
+              (row) =>
+                cleanText(row?.label) ||
+                cleanText(row?.value) ||
+                cleanText(row?.unit),
+            )),
+      )
+      .map((group) => ({
+        _key: group._key,
+        title: cleanText(group.title) || 'N/A',
+        specifications: cleanRows(group.specifications),
+      }))
+      .filter((group) => group.specifications.length > 0),
+  }));
+
+const selectedModel = models[0];
+
+const hasKeySpecifications =
+  (selectedModel?.keySpecifications.length ?? 0) > 0;
+
+const hasGroups =
+  (selectedModel?.specificationGroups.length ?? 0) > 0;
+
+const hasAnyInformation = models.some(
+  (model) =>
+    model.keySpecifications.length > 0 ||
+    model.specificationGroups.length > 0,
+);
+
+const selectedModelHasInformation =
+  (selectedModel?.keySpecifications.length ?? 0) > 0 ||
+  (selectedModel?.specificationGroups.length ?? 0) > 0;
+
+const heading = cleanText(specifications?.heading);
+const subtitle = cleanText(specifications?.subtitle);
+
+const keySpecCount = selectedModel?.keySpecifications.length ?? 0;
+
+const keySpecGridClass =
+  keySpecCount <= 1
+    ? 'grid-cols-1'
+    : keySpecCount === 2
+      ? 'grid-cols-1 sm:grid-cols-2'
+      : keySpecCount === 3
+        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
+const isFullWidthGroup = (group: { title: string }) =>
+  group.title.toLowerCase().includes('die cushion');
+
+const initialGroups = selectedModel?.specificationGroups ?? [];
+---
+
+{!hasAnyInformation ? (
+  <section
+    class="bg-[#000a22] py-16 sm:py-20 lg:py-28"
+    aria-label="Technical specifications"
+  >
+    <div class="container">
+      <div
+        class="rounded-2xl border border-white/10 bg-white/5 px-6 py-12 text-center sm:px-8"
+      >
+        <h2 class="text-xl tracking-tight text-white">
+          Technical Information Unavailable
+        </h2>
+        <p class="mx-auto mt-4 max-w-lg text-base leading-7 text-white/60">
+          Detailed specifications for this product are not currently available.
+          Please contact our team for further information.
+        </p>
+      </div>
+    </div>
+  </section>
+) : (
+  <section
+    id="technical-specifications"
+    class="bg-[#000a22] py-16 text-white sm:py-20 lg:py-28"
+  >
+    <div class="container">
+      {(heading || subtitle || models.length > 1) && (
+        <header
+          class="mb-10 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between"
+        >
+          {(heading || subtitle) && (
+            <div class="max-w-3xl">
+              {heading && (
+                <h2
+                  class="tracking-tight text-[clamp(30px,3.6vw,50.5px)]"
+                >
+                  {heading}
+                </h2>
+              )}
+
+              {subtitle && (
+                <p class="mt-4 max-w-2xl text-base leading-7 text-white/70">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          )}
+
+          {models.length > 1 && (
+            <label
+              class="grid w-full gap-2 text-sm font-medium md:w-56 md:shrink-0"
+              for="spec-model-selector"
+            >
+              <span>Select Model</span>
+              <select
+                id="spec-model-selector"
+                class="w-full rounded-lg border border-white/20 bg-[#000a22]/50 px-4 py-3 text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              >
+                {models.map((model, index) => (
+                  <option
+                    class="w-full rounded-lg border border-gray-300
+         bg-white px-4 py-2.5 text-gray-700
+         shadow-sm outline-none
+         focus:border-blue-500 focus:ring-2
+         focus:ring-blue-200"
+                    value={model.modelName}
+                    selected={index === 0}
+                  >
+                    {model.modelName}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </header>
+      )}
+
+      {models.length > 1 && (
+        <script
+          type="application/json"
+          id="specification-model-data"
+          set:html={JSON.stringify(models).replaceAll('<', '\\u003c')}
+        />
+      )}
+
+      {selectedModel && (
+        <div class="contents">
+          <section
+            id="key-specifications-section"
+            class:list={[
+              'mb-12 bg-white/5 p-5 sm:p-7',
+              !hasKeySpecifications && 'hidden',
+            ]}
+          >
+            <h3 class="mb-6 text-lg tracking-tight">
+              Key Specifications
+            </h3>
+
+            <div
+              id="key-specifications-grid"
+              class={`grid ${keySpecGridClass} gap-5`}
+            >
+              {selectedModel.keySpecifications.map((spec, index) => (
+                <div
+                  class:list={[
+                    'min-w-0 lg:px-5',
+                    index === 0 && 'lg:pl-0',
+                    index > 0 && 'lg:border-l lg:border-white/10',
+                  ]}
+                >
+                  <p class="text-sm leading-6 text-white/60">
+                    {spec.label}
+                  </p>
+
+                  <p
+                    class="mt-2 break-words text-xl tracking-tight"
+                  >
+                    {spec.value}
+                    {spec.unit && (
+                      <span class="ml-1 text-sm font-normal text-white/50">
+                        {spec.unit}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <div
+            id="spec-not-available"
+            class:list={[
+              'py-16 text-center',
+              selectedModelHasInformation && 'hidden',
+            ]}
+          >
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-8 py-16"
+            >
+                <h3 class="text-lg tracking-tight text-white mb-3">
+                  Information Not Available
+                </h3>
+                <p class="text-base leading-7 text-white/60 max-w-lg mx-auto">
+                  No specifications are available for model{' '}
+                  <strong class="text-white">{selectedModel.modelName}</strong>. Please contact our team for further information.
+                </p>
+              </div>
+          </div>
+
+          <div
+            id="full-specifications-heading"
+            class:list={[
+              'mb-5 flex flex-wrap items-end justify-between gap-3',
+              !hasGroups && 'hidden',
+            ]}
+          >
+            <h3 class="text-xl tracking-tight sm:text-2xl">
+              Full Specifications
+            </h3>
+
+            <p
+              id="spec-selected-model"
+              class="text-sm text-white/50"
+              aria-live="polite"
+            >
+              Model {selectedModel.modelName}
+            </p>
+          </div>
+
+          <div
+            id="specification-groups"
+            class:list={[
+              'grid grid-cols-1 items-start gap-5 md:grid-cols-2',
+              !hasGroups && 'hidden',
+            ]}
+          >
+            {initialGroups.map((group, index) => (
+              <details
+                class:list={[
+                  'specification-group group min-w-0 overflow-hidden bg-white/5',
+                  (
+                    isFullWidthGroup(group) ||
+                    (
+                      index === initialGroups.length - 1 &&
+                      initialGroups.length % 2 !== 0
+                    )
+                  ) && 'md:col-span-2',
+                ]}
+                open={index === 0}
+              >
+                <summary
+                  class="flex cursor-pointer list-none items-center justify-between gap-4 bg-white/5 px-5 py-4  transition-colors hover:bg-white/10 [&::-webkit-details-marker]:hidden"
+                >
+                  <span>{group.title}</span>
+                  <span
+                    aria-hidden="true"
+                    class="text-xl text-white/50"
+                  >
+                    +
+                  </span>
+                </summary>
+
+                <div class="px-5 pb-3">
+                  {group.specifications.map((spec) => (
+                    <div
+                      class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(3rem,0.55fr)] gap-3 border-b border-white/10 py-4 text-sm last:border-b-0 sm:gap-5"
+                    >
+                      <span
+                        class="min-w-0 break-words leading-6 text-white/60"
+                      >
+                        {spec.label}
+                      </span>
+
+                      <span
+                        class="min-w-0 break-words font-medium leading-6"
+                      >
+                        {spec.value}
+                      </span>
+
+                      <span
+                        class="min-w-0 break-words leading-6 text-white/50"
+                      >
+                        {spec.unit || '—'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+)}
+
+<script>
+  const selector = document.querySelector<HTMLSelectElement>(
+    '#spec-model-selector',
+  );
+
+  const dataElement = document.querySelector<HTMLScriptElement>(
+    '#specification-model-data',
+  );
+
+  const keySection = document.querySelector<HTMLElement>(
+    '#key-specifications-section',
+  );
+
+  const keyGrid = document.querySelector<HTMLElement>(
+    '#key-specifications-grid',
+  );
+
+  const groupsHeading = document.querySelector<HTMLElement>(
+    '#full-specifications-heading',
+  );
+
+  const groupsGrid = document.querySelector<HTMLElement>(
+    '#specification-groups',
+  );
+
+  const selectedLabel = document.querySelector<HTMLElement>(
+    '#spec-selected-model',
+  );
+
+  interface ClientRow {
+    label: string;
+    value: string;
+    unit?: string;
+  }
+
+  interface ClientGroup {
+    title: string;
+    specifications: ClientRow[];
+  }
+
+  interface ClientModel {
+    modelName: string;
+    keySpecifications: ClientRow[];
+    specificationGroups: ClientGroup[];
+  }
+
+  let models: ClientModel[] = [];
+
+  try {
+    models = dataElement?.textContent
+      ? JSON.parse(dataElement.textContent)
+      : [];
+  } catch (error) {
+    console.error('Unable to parse technical specification data.', error);
+  }
+
+  function cleanText(value: unknown): string {
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
+  function cleanRows(rows: ClientRow[] = []): ClientRow[] {
+    return rows
+      .filter(
+        (row) =>
+          row &&
+          (cleanText(row.label) ||
+            cleanText(row.value) ||
+            cleanText(row.unit)),
+      )
+      .map((row) => ({
+        ...row,
+        label: cleanText(row.label) || 'N/A',
+        value: cleanText(row.value) || 'N/A',
+        unit: cleanText(row.unit),
+      }));
+  }
+
+  function cleanGroups(groups: ClientGroup[] = []): ClientGroup[] {
+    return groups
+      .filter((group) => group)
+      .map((group) => ({
+        ...group,
+        title: cleanText(group.title) || 'N/A',
+        specifications: cleanRows(group.specifications),
+      }))
+      .filter((group) => group.specifications.length > 0);
+  }
+
+  function createCell(
+    className: string,
+    text: string,
+  ): HTMLSpanElement {
+    const cell = document.createElement('span');
+    cell.className = className;
+    cell.textContent = text;
+    return cell;
+  }
+
+  function renderKeySpecifications(rows: ClientRow[]) {
+    if (!keyGrid || !keySection) return;
+
+    keyGrid.replaceChildren();
+
+    const count = rows.length;
+
+    const columnsClass =
+      count <= 1
+        ? 'grid-cols-1'
+        : count === 2
+          ? 'grid-cols-1 sm:grid-cols-2'
+          : count === 3
+            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
+    keyGrid.className = `grid ${columnsClass} gap-5`;
+
+    rows.forEach((spec, index) => {
+      const item = document.createElement('div');
+      item.className = [
+        'min-w-0 lg:px-5',
+        index === 0 ? 'lg:pl-0' : 'lg:border-l lg:border-white/10',
+      ].join(' ');
+
+      const label = document.createElement('p');
+      label.className = 'text-sm leading-6 text-white/60';
+      label.textContent = spec.label;
+
+      const value = document.createElement('p');
+      value.className =
+        'mt-2 break-words text-xl tracking-tight';
+      value.append(document.createTextNode(spec.value));
+
+      if (spec.unit) {
+        const unit = document.createElement('span');
+        unit.className = 'ml-1 text-sm font-normal text-white/50';
+        unit.textContent = spec.unit;
+        value.append(unit);
+      }
+
+      item.append(label, value);
+      keyGrid.append(item);
+    });
+
+    keySection.classList.toggle('hidden', rows.length === 0);
+  }
+
+  function renderGroups(groups: ClientGroup[]) {
+    if (!groupsGrid || !groupsHeading) return;
+
+    groupsGrid.replaceChildren();
+
+    groups.forEach((group, index) => {
+      const isDieCushion = group.title
+        .toLowerCase()
+        .includes('die cushion');
+
+      const isLastOdd =
+        index === groups.length - 1 && groups.length % 2 !== 0;
+
+      const details = document.createElement('details');
+
+      details.className = [
+        'specification-group group min-w-0 overflow-hidden rounded-xl border border-white/10 bg-white/5',
+        isDieCushion || isLastOdd ? 'md:col-span-2' : '',
+      ].join(' ');
+
+      details.open = index === 0;
+
+      const summary = document.createElement('summary');
+      summary.className =
+        'flex cursor-pointer list-none items-center justify-between gap-4 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10 [&::-webkit-details-marker]:hidden';
+
+      const title = document.createElement('span');
+      title.textContent = group.title;
+
+      const icon = document.createElement('span');
+      icon.className = 'text-xl font-normal text-white/50';
+      icon.textContent = '+';
+      icon.setAttribute('aria-hidden', 'true');
+
+      summary.append(title, icon);
+
+      const rowsContainer = document.createElement('div');
+      rowsContainer.className = 'px-5 pb-3';
+
+      group.specifications.forEach((spec) => {
+        const row = document.createElement('div');
+
+        row.className =
+          'grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(3rem,0.55fr)] gap-3 border-b border-white/10 py-4 text-sm last:border-b-0 sm:gap-5';
+
+        row.append(
+          createCell(
+            'min-w-0 break-words leading-6 text-white/60',
+            spec.label,
+          ),
+          createCell(
+            'min-w-0 break-words font-medium leading-6',
+            spec.value,
+          ),
+          createCell(
+            'min-w-0 break-words leading-6 text-white/50',
+            spec.unit || '—',
+          ),
+        );
+
+        rowsContainer.append(row);
+      });
+
+      details.append(summary, rowsContainer);
+      groupsGrid.append(details);
+    });
+
+    groupsGrid.classList.toggle('hidden', groups.length === 0);
+    groupsHeading.classList.toggle('hidden', groups.length === 0);
+  }
+
+  const notAvailableMessage = document.getElementById(
+    'spec-not-available',
+  );
+
+  selector?.addEventListener('change', () => {
+    const model = models.find(
+      (item) => item.modelName === selector.value,
+    );
+
+    if (!model) return;
+
+    const hasModelInfo =
+      model.keySpecifications.length > 0 ||
+      model.specificationGroups.length > 0;
+
+    if (notAvailableMessage) {
+      notAvailableMessage.classList.toggle('hidden', hasModelInfo);
+    }
+
+    const keySpecs = cleanRows(model.keySpecifications);
+    const groups = cleanGroups(model.specificationGroups);
+
+    renderKeySpecifications(keySpecs);
+    renderGroups(groups);
+
+    if (keySection) {
+      keySection.classList.toggle('hidden', keySpecs.length === 0);
+    }
+
+    if (groupsHeading) {
+      groupsHeading.classList.toggle('hidden', groups.length === 0);
+    }
+
+    if (groupsGrid) {
+      groupsGrid.classList.toggle('hidden', groups.length === 0);
+    }
+
+    if (selectedLabel) {
+      selectedLabel.textContent = `Model ${model.modelName}`;
+    }
+  });
+
+  // Keep the plus/minus icon in sync with native details elements.
+  document
+    .querySelector('#specification-groups')
+    ?.addEventListener('toggle', (event) => {
+      const details = event.target;
+
+      if (!(details instanceof HTMLDetailsElement)) return;
+
+      const icon = details.querySelector('summary span[aria-hidden="true"]');
+
+      if (icon) {
+        icon.textContent = details.open ? '−' : '+';
+      }
+    }, true);
+</script>

@@ -170,10 +170,7 @@ export const paginatedProductsQuery = `*[
 }`;
 
 
-/* --------------------------------------------------
-   Single product page
--------------------------------------------------- */
-
+/* Single product page */
 export const productBySlugQuery = `*[
   _type == "product" &&
   slug.current == $slug
@@ -181,9 +178,9 @@ export const productBySlugQuery = `*[
   _id,
   name,
   "slug": slug.current,
-  modelNumber,
   shortDescription,
 
+  // Basic information
   featuredImage {
     alt,
     "url": asset->url,
@@ -191,38 +188,152 @@ export const productBySlugQuery = `*[
     "lqip": asset->metadata.lqip
   },
 
-  gallery[] {
-    _key,
-    alt,
-    "url": asset->url,
-    "dimensions": asset->metadata.dimensions,
-    "lqip": asset->metadata.lqip
+  // Block 1: Hero
+  hero {
+    eyebrow,
+    heading,
+    tagline,
+    subLine,
+    "backgroundVideo": backgroundVideo.asset->url,
+    primaryCtaLabel,
+    primaryCtaUrl,
+    brochureCtaLabel
   },
 
-  description,
-
-  specifications {
+  // Block 2: Pillar cards
+  introText,
+  highlightText,
+  pillars[] {
+    _key,
     heading,
-    subtitle,
-    capacities[] {
+    copy,
+    image {
+      alt,
+      "url": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
+    }
+  },
+
+  // Block 3: Product stats / engineering statement
+  productStats {
+    label,
+    heading,
+    copy,
+    image {
+      alt,
+      "url": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
+    }
+  },
+
+  // Block 4: Key numbers
+  keyNumbers[] {
+    _key,
+    label,
+    value
+  },
+
+  // Blocks 5–6: Feature blocks
+  featureBlocks[] {
+    _key,
+    featureType,
+    heading,
+    hook,
+    copy,
+    image {
+      alt,
+      "url": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
+    }
+  },
+
+  // Block 7: Tonnage selector
+  tonnageBands[] {
+    _key,
+    title,
+    models,
+    lead,
+    copy,
+    image {
+      alt,
+      "url": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
+    }
+  },
+
+  // Block 8: Applications carousel
+  applications[] {
+    _key,
+    heading,
+    copy,
+    image {
+      alt,
+      "url": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
+    }
+  },
+
+  // Block 9: Technical specifications
+  specifications {
+  heading,
+  subtitle,
+  capacities[] {
+    _key,
+    modelName,
+    keySpecifications[] {
       _key,
-      modelTitle,
-      modelName,
+      label,
+      unit,
+      value
+    },
+    specificationGroups[] {
+      _key,
+      title,
       specifications[] {
         _key,
         label,
         unit,
         value
-      },
-      additionalSpecifications {
-        title,
-        specifications[] {
-          _key,
-          label,
-          unit,
-          value
-        }
       }
+    }
+  }
+},
+
+  // Block 10: Downloads
+  downloads {
+    brochureLabel,
+    foundationDrawingLabel,
+    foundationDrawingUrl
+  },
+
+  // Block 10: Final CTA band
+  finalCta {
+    heading,
+    copy,
+    buttonLabel,
+    buttonUrl,
+    backgroundImage {
+      alt,
+      "url": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
+    }
+  },
+
+  // Existing product details
+  description[] {
+    ...,
+    _type == "image" => {
+      ...,
+      "url": asset->url,
+      "alt": alt,
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
     }
   },
 
@@ -232,22 +343,10 @@ export const productBySlugQuery = `*[
     "filename": asset->originalFilename
   },
 
-  relatedProducts[]-> {
-    _id,
-    name,
-    "slug": slug.current,
-    shortDescription,
-    featuredImage {
-      alt,
-      "url": asset->url
-    }
-  },
-
-  inquiryCtaLabel,
-  inquiryMessage,
   featured,
   displayOrder,
 
+  // SEO
   seo {
     metaTitle,
     metaDescription,
@@ -263,11 +362,7 @@ export const productBySlugQuery = `*[
 }`;
 
 
-/* --------------------------------------------------
-   All product slugs
-   Used for static route generation
--------------------------------------------------- */
-
+/* All product slugs — used by Astro getStaticPaths() */
 export const allProductSlugsQuery = `*[
   _type == "product" &&
   defined(slug.current)

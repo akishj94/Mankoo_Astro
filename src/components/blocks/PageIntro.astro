@@ -2,11 +2,12 @@
 interface Props {
   eyebrow?: string;
   title?: string;
+  tagline?:string;
   content?: string;
   headingLevel?: 'h1' | 'h2' | 'h3';
 }
 
-const { eyebrow = '', title = '', content = '', headingLevel = 'h1' } = Astro.props;
+const { eyebrow = '', title = '', content = '', tagline = '', headingLevel = 'h1' } = Astro.props;
 
 const paragraphs = content
   .split(/\n{2,}/)
@@ -14,6 +15,7 @@ const paragraphs = content
   .filter(Boolean);
 
 const Heading = headingLevel;
+const max = 'max-w-[11em]';
 ---
 
 <section data-page-intro class="text-white light:text-ink">
@@ -33,11 +35,12 @@ const Heading = headingLevel;
         {title && (
           <Heading
             class:list={[
-              'max-w-[11em] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]',
+              'leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]',
               eyebrow && 'mt-6',
             ]}
           >
             {title}
+            <span class="block text-white/60">{tagline}</span>
           </Heading>
         )}
       </div>

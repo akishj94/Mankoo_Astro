@@ -1,0 +1,83 @@
+---
+interface Props {
+  introText?: string;
+  highlightText?: string;
+  pillars: Array<{
+    _key: string;
+    heading: string;
+    copy: string;
+    image: {
+      alt: string;
+      url: string;
+      dimensions: { width: number; height: number };
+      lqip: string;
+    } | null;
+  }>;
+}
+
+const {
+  introText = '',
+  highlightText = '',
+  pillars = [],
+} = Astro.props;
+---
+
+{introText || highlightText || pillars.length > 0 ? (
+  <section class="py-12 lg:py-24">
+    <div class="container">
+      {introText && (
+        <div class="mb-8 max-w-3xl mb:20 md:mb-24 lg:mb-30">
+          <h2 class="text-[clamp(26px,2.5vw,36px)] leading-[1.2] tracking-tight">
+            {introText}
+            {highlightText && (
+              <>
+                <span class="block text-white/60">
+                  {highlightText}
+                </span>
+              </>
+            )}
+          </h2>
+        </div>
+      )}
+      {pillars.length > 0 && (
+        <div class="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-3 lg:gap-6">
+          {pillars.map((pillar) => (
+            <article
+              class="relative overflow-hidden rounded-[24px] bg-neutral-900 aspect-[1/1]"
+            >
+              {pillar.image?.url && (
+                <img
+                  src={pillar.image.url}
+                  alt={pillar.image.alt || pillar.heading || ''}
+                  width={pillar.image.dimensions?.width || 800}
+                  height={pillar.image.dimensions?.height || 600}
+                  loading="lazy"
+                  decoding="async"
+                  class="absolute inset-0 !size-full object-cover object-center"
+                />
+              )}
+
+              <div
+                class="absolute inset-0 bg-black/40"
+                aria-hidden="true"
+              />
+
+              <div class="absolute left-6 right-6 top-6 z-10">
+                <h3 class="text-2xl leading-snug tracking-tight text-white">
+                  {pillar.heading}
+                </h3>
+              </div>
+
+              <div class="absolute bottom-6 left-6 right-6 z-10">
+                <p class="leading-tight text-white/90 md:max-w-[65%]">
+                  {pillar.copy}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      
+    </div>
+  </section>
+) : null}

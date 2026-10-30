@@ -91,7 +91,7 @@ export const product = defineType({
           title: "Background Video",
           type: "file",
           options: { accept: "video/*" },
-        }),
+        }),        
         defineField({
           name: "primaryCtaLabel",
           title: "Primary Button Label",
@@ -99,17 +99,60 @@ export const product = defineType({
           initialValue: "Get a quote",
         }),
         defineField({
-          name: "primaryCtaUrl",
-          title: "Primary Button URL",
-          type: "url",
-          description: "For example, the contact or enquiry page URL.",
+          name: "primaryCtaLinkType",
+          title: "Primary Button Link Type",
+          type: "string",
+          options: {
+            list: [
+              { title: "Internal Link", value: "internal" },
+              { title: "External URL", value: "external" },
+            ],
+            layout: "radio",
+          },
+          initialValue: "internal",
         }),
         defineField({
-          name: "brochureCtaLabel",
-          title: "Brochure Button Label",
-          type: "string",
-          initialValue: "Download brochure",
+          name: "primaryCtaInternalLink",
+          title: "Primary Button Internal Link",
+          type: "reference",
+          to: [
+            { type: "page" },
+            { type: "product" },
+            { type: "post" },
+          ],
+          hidden: ({ parent }) => parent?.primaryCtaLinkType !== "internal",
+          validation: (Rule) =>
+            Rule.custom((value, context) => {
+              const parent = context.parent as
+                | { primaryCtaLinkType?: string }
+                | undefined;
+
+              if (parent?.primaryCtaLinkType === "internal" && !value) {
+                return "Select an internal destination.";
+              }
+
+              return true;
+            }),
         }),
+        defineField({
+          name: "primaryCtaExternalUrl",
+          title: "Primary Button External URL",
+          type: "url",
+          hidden: ({ parent }) => parent?.primaryCtaLinkType !== "external",
+          validation: (Rule) =>
+            Rule.custom((value, context) => {
+              const parent = context.parent as
+                | { primaryCtaLinkType?: string }
+                | undefined;
+
+              if (parent?.primaryCtaLinkType === "external" && !value) {
+                return "Enter an external URL.";
+              }
+
+              return true;
+            }),
+        }),
+        
       ],
     }),
 
@@ -272,29 +315,29 @@ export const product = defineType({
           name: "productFeatureBlock",
           title: "Feature Block",
           fields: [
-            defineField({
-              name: "featureType",
-              title: "Feature Type",
-              type: "string",
-              options: {
-                list: [
-                  { title: "Build", value: "build" },
-                  { title: "Control", value: "control" },
-                  { title: "Other", value: "other" },
-                ],
-              },
-            }),
+            // defineField({
+            //   name: "featureType",
+            //   title: "Feature Type",
+            //   type: "string",
+            //   options: {
+            //     list: [
+            //       { title: "Build", value: "build" },
+            //       { title: "Control", value: "control" },
+            //       { title: "Other", value: "other" },
+            //     ],
+            //   },
+            // }),
             defineField({
               name: "heading",
               title: "Heading",
               type: "string",
               validation: (Rule) => Rule.required(),
             }),
-            defineField({
-              name: "hook",
-              title: "One-Line Hook",
-              type: "string",
-            }),
+            // defineField({
+            //   name: "hook",
+            //   title: "One-Line Hook",
+            //   type: "string",
+            // }),
             defineField({
               name: "copy",
               title: "Copy",
@@ -532,19 +575,49 @@ export const product = defineType({
       of: [{ type: "block" }, { type: "image", options: { hotspot: true } }],
       group: "details",
     }),
+    
     defineField({
       name: "brochures",
       title: "Product Brochures",
       type: "array",
+      group: "details",
+      description: "Upload PDF brochures and provide a label for each download.",
       of: [
         {
-          type: "file",
-          options: { accept: ".pdf" },
+          type: "object",
+          name: "productBrochure",
+          title: "Brochure",
+          fields: [
+            defineField({
+              name: "label",
+              title: "Download Label",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "file",
+              title: "PDF File",
+              type: "file",
+              options: { accept: ".pdf,application/pdf" },
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "label",
+              filename: "file.asset.originalFilename",
+            },
+            prepare({ title, filename }) {
+              return {
+                title: title || "Untitled brochure",
+                subtitle: filename || "No PDF uploaded",
+              };
+            },
+          },
         },
       ],
-      validation: (Rule) => Rule.max(1),
-      group: "details",
     }),
+
     // defineField({
     //   name: "relatedProducts",
     //   title: "Related Products",

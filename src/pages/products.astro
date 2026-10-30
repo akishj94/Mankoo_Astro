@@ -59,6 +59,7 @@ const seoDescription =
   listingPage?.listingDescription ||
   "";
 
+const seoKeywords = listingPage?.seo?.metaKeywords || "";
 const canonical =
   listingPage?.seo?.canonicalUrl || "/products";
 
@@ -73,6 +74,7 @@ const eyebrow = 'Machines';
   title={seoTitle}
   description={seoDescription}
   canonical={canonical}
+  metaKeywords={seoKeywords}
 >
   <section data-page-intro class="text-white border-b-2 border-[#242B3C]">
   <div

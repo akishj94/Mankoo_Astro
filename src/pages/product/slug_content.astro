@@ -1,0 +1,789 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { sanityClient } from "sanity:client";
+import {
+  productBySlugQuery,
+  allProductSlugsQuery,
+} from "../../lib/queries";
+
+import CTA from "../../components/blocks/CTA.astro";
+import PageIntro from "../../components/blocks/PageIntro.astro";
+
+export async function getStaticPaths() {
+  const products = await sanityClient.fetch(allProductSlugsQuery);
+
+  return products.map((product: { slug: string }) => ({
+    params: { slug: product.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+
+const product = await sanityClient.fetch(productBySlugQuery, { slug });
+
+if (!product) {
+  return new Response("Product not found", { status: 404 });
+}
+
+const seoTitle =
+  product.seo?.metaTitle || `${product.name} | Mankoo India`;
+
+const seoDescription =
+  product.seo?.metaDescription || product.shortDescription || "";
+
+const canonical =
+  product.seo?.canonicalUrl || `/product/${product.slug}`;
+
+const hero = product.hero;
+const pillars = product.pillars ?? [];
+const numbers = product.keyNumbers ?? [];
+const features = product.featureBlocks ?? [];
+const bands = product.tonnageBands ?? [];
+const applications = product.applications ?? [];
+const models = product.specifications?.capacities ?? [];
+const brochures = product.brochures ?? [];
+
+const stats = product.productStats;
+
+const buildFeature = features.find(
+  (feature: any) => feature.featureType === "build"
+);
+
+const controlFeature = features.find(
+  (feature: any) => feature.featureType === "control"
+);
+
+const otherFeatures = features.filter(
+  (feature: any) =>
+    feature.featureType !== "build" &&
+    feature.featureType !== "control"
+);
+
+const requestedDefaultModel = product.specifications?.defaultModel;
+
+const initialModel =
+  models.find(
+    (model: any) =>
+      model.modelName === requestedDefaultModel ||
+      model.modelTitle === requestedDefaultModel
+  ) ?? models[0];
+
+const initialModelKey = initialModel?._key;
+
+const getModelLabel = (model: any) =>
+  [model.modelName, model.modelTitle]
+    .filter(Boolean)
+    .join(" — ") || "Model";
+
+const getKeySpecifications = (model: any) => {
+  if (model?.keySpecifications?.length) {
+    return model.keySpecifications;
+  }
+
+  return model?.specifications ?? [];
+};
+
+const getSpecificationGroups = (model: any) => {
+  const groups = (model?.specificationGroups ?? []).filter(
+    (group: any) => group.specifications?.length
+  );
+
+  if (groups.length) return groups;
+
+  const legacyGroups = [];
+
+  if (model?.specifications?.length) {
+    legacyGroups.push({
+      _key: "legacy-specifications",
+      title: "Specifications",
+      specifications: model.specifications,
+    });
+  }
+
+  if (model?.additionalSpecifications?.specifications?.length) {
+    legacyGroups.push({
+      _key: "legacy-additional",
+      title:
+        model.additionalSpecifications.title ||
+        "Additional Specifications",
+      specifications: model.additionalSpecifications.specifications,
+    });
+  }
+
+  return legacyGroups;
+};
+
+const plainText = (blocks: any[] = []) =>
+  blocks
+    .map((block) =>
+      block._type === "block"
+        ? (block.children ?? [])
+            .map((child: any) => child.text ?? "")
+            .join("")
+        : ""
+    )
+    .filter(Boolean)
+    .join("\n\n");
+
+const descriptionText = plainText(product.description);
+
+const firstBrochure = brochures.find((file: any) => file.url);
+
+const brochureUrl = firstBrochure?.url;
+
+const brochureLabel =
+  hero?.brochureCtaLabel ||
+  product.downloads?.brochureLabel ||
+  "Download Brochure";
+
+const foundationUrl = product.downloads?.foundationDrawingUrl;
+
+const primaryCtaUrl = hero?.primaryCtaUrl || "/contact";
+
+const finalCtaUrl = product.finalCta?.buttonUrl || "/contact";
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDescription}
+  canonical={canonical}
+>
+  <main class="product-page">
+    <!-- 1. HERO -->
+     
+    
+    <section class="relative flex min-h-[700px] min-h-[80svh] items-center overflow-hidden bg-neutral-900 text-white lg:min-h-[min(780px,88svh)]">
+      {hero?.backgroundVideo ? (
+        <video
+          class="absolute inset-0 size-full object-cover"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-hidden="true"
+        >
+          <source src={hero.backgroundVideo} type="video/mp4" />
+        </video>
+      ) : product.featuredImage?.url ? (
+        <img
+          class="absolute inset-0 size-full object-cover"
+          src={product.featuredImage.url}
+          alt={product.featuredImage.alt || product.name}
+          width={product.featuredImage.dimensions?.width || 1600}
+          height={product.featuredImage.dimensions?.height || 900}
+          fetchpriority="high"
+          decoding="async"
+        />
+      ) : null}
+
+      <div
+        class="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.8),rgba(0,0,0,0.2)_85%),linear-gradient(0deg,rgba(0,0,0,0.45),transparent_50%)]"
+        aria-hidden="true"
+      ></div>
+
+      <div class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-7xl py-24 sm:w-[calc(100%-3rem)] lg:py-32">
+        {hero?.eyebrow && (
+          <p class="mb-5 text-xs font-bold uppercase tracking-[0.17em] text-accent">
+            {hero.eyebrow}
+          </p>
+        )}
+
+        <h1 class="mb-6 max-w-5xl text-5xl font-semibold leading-[0.98] tracking-tight sm:text-6xl lg:text-8xl">
+          {hero?.heading || product.name}
+        </h1>
+
+        {hero?.tagline && (
+          <p class="mb-4 text-xl font-medium sm:text-2xl">
+            {hero.tagline}
+          </p>
+        )}
+
+        <p class="max-w-2xl whitespace-pre-line text-base leading-8 text-white/80 sm:text-lg">
+          {hero?.subLine || product.shortDescription}
+        </p>
+
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a
+            href={primaryCtaUrl}
+            class="inline-flex min-h-13 items-center justify-center bg-white px-6 py-4 text-sm font-semibold text-neutral-900 transition-colors hover:bg-neutral-200"
+          >
+            {hero?.primaryCtaLabel || "Enquire Now"}
+          </a>
+
+          {brochureUrl && (
+            <a
+              href={brochureUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex min-h-13 items-center justify-center border border-white/65 px-6 py-4 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-neutral-900"
+            >
+              {brochureLabel}
+            </a>
+          )}
+        </div>
+      </div>
+    </section>
+    <PageIntro 
+      eyebrow={hero?.eyebrow ?? ''}
+      title={hero?.heading || product.name}
+      tagline={hero?.tagline ?? ''}
+      content={hero?.subLine ?? ''}
+     >
+     </PageIntro>
+
+    <!-- 2. THREE PILLARS -->
+    {pillars.length > 0 && (
+      <section class="section section--pillars">
+        <div class="section-heading">
+          <p class="eyebrow">THE ENGINEERING</p>
+          <h2>Built around performance.</h2>
+        </div>
+
+        <div class="pillar-grid">
+          {pillars.map((pillar: any, index: number) => (
+            <article class="pillar-card" key={pillar._key}>
+              {pillar.image?.url && (
+                <div class="pillar-card__image">
+                  <img
+                    src={pillar.image.url}
+                    alt={pillar.image.alt || pillar.heading || ""}
+                    width={pillar.image.dimensions?.width || 800}
+                    height={pillar.image.dimensions?.height || 600}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              )}
+
+              <div class="pillar-card__body">
+                <span class="section-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3>{pillar.heading}</h3>
+                {pillar.copy && <p>{pillar.copy}</p>}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- 3. ENGINEERING STATEMENT -->
+    {stats && (
+      <section class="engineering-section">
+        {stats.image?.url && (
+          <div class="engineering-section__image">
+            <img
+              src={stats.image.url}
+              alt={stats.image.alt || stats.heading || product.name}
+              width={stats.image.dimensions?.width || 1200}
+              height={stats.image.dimensions?.height || 900}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        )}
+
+        <div class="engineering-section__content">
+          {stats.label && <p class="eyebrow">{stats.label}</p>}
+          <h2>{stats.heading}</h2>
+          {stats.copy && <p class="section-copy">{stats.copy}</p>}
+        </div>
+      </section>
+    )}
+
+    <!-- 4. KEY NUMBERS -->
+    {numbers.length > 0 && (
+      <section class="numbers-section">
+        <div class="numbers-section__heading">
+          <p class="eyebrow">AT A GLANCE</p>
+          <h2>Performance by the numbers.</h2>
+        </div>
+
+        <div class="numbers-grid">
+          {numbers.map((item: any, index: number) => (
+            <div class="number-item" key={item._key}>
+              <span class="number-item__index">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- 5. BUILD FEATURE -->
+    {buildFeature && (
+      <section class="feature-section">
+        <div class="feature-section__image">
+          {buildFeature.image?.url && (
+            <img
+              src={buildFeature.image.url}
+              alt={buildFeature.image.alt || buildFeature.heading || ""}
+              width={buildFeature.image.dimensions?.width || 1200}
+              height={buildFeature.image.dimensions?.height || 900}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+        </div>
+
+        <div class="feature-section__content">
+          <p class="eyebrow">01 / MACHINE BUILD</p>
+          <h2>{buildFeature.heading}</h2>
+
+          {buildFeature.hook && (
+            <p class="feature-section__hook">{buildFeature.hook}</p>
+          )}
+
+          {buildFeature.copy && (
+            <p class="section-copy">{buildFeature.copy}</p>
+          )}
+        </div>
+      </section>
+    )}
+
+    <!-- 6. CONTROL FEATURE -->
+    {controlFeature && (
+      <section class="feature-section feature-section--reverse">
+        <div class="feature-section__image">
+          {controlFeature.image?.url && (
+            <img
+              src={controlFeature.image.url}
+              alt={controlFeature.image.alt || controlFeature.heading || ""}
+              width={controlFeature.image.dimensions?.width || 1200}
+              height={controlFeature.image.dimensions?.height || 900}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+        </div>
+
+        <div class="feature-section__content">
+          <p class="eyebrow">02 / CONTROL & OPERATION</p>
+          <h2>{controlFeature.heading}</h2>
+
+          {controlFeature.hook && (
+            <p class="feature-section__hook">{controlFeature.hook}</p>
+          )}
+
+          {controlFeature.copy && (
+            <p class="section-copy">{controlFeature.copy}</p>
+          )}
+        </div>
+      </section>
+    )}
+
+    <!-- Additional feature blocks, if present -->
+    {otherFeatures.map((feature: any, index: number) => (
+      <section
+        class:list={[
+          "feature-section",
+          index % 2 === 1 && "feature-section--reverse",
+        ]}
+        key={feature._key}
+      >
+        <div class="feature-section__image">
+          {feature.image?.url && (
+            <img
+              src={feature.image.url}
+              alt={feature.image.alt || feature.heading || ""}
+              width={feature.image.dimensions?.width || 1200}
+              height={feature.image.dimensions?.height || 900}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+        </div>
+
+        <div class="feature-section__content">
+          <p class="eyebrow">
+            {String(index + 3).padStart(2, "0")} / ENGINEERING DETAIL
+          </p>
+          <h2>{feature.heading}</h2>
+          {feature.hook && (
+            <p class="feature-section__hook">{feature.hook}</p>
+          )}
+          {feature.copy && <p class="section-copy">{feature.copy}</p>}
+        </div>
+      </section>
+    ))}
+
+    <!-- 7. TONNAGE / CONFIGURATION SELECTOR -->
+    {bands.length > 0 && (
+      <section class="bands-section" id="configurations">
+        <div class="section-heading section-heading--light">
+          <p class="eyebrow">CONFIGURATIONS</p>
+          <h2>Find the right configuration.</h2>
+          <p>
+            Explore the available configurations for this machine.
+          </p>
+        </div>
+
+        <div class="band-selector" role="group" aria-label="Select configuration">
+          {bands.map((band: any, index: number) => (
+            <button
+              class:list={[
+                "band-selector__button",
+                index === 0 && "is-active",
+              ]}
+              type="button"
+              data-band-button={band._key}
+              aria-pressed={index === 0 ? "true" : "false"}
+            >
+              <span>{band.title}</span>
+              <span aria-hidden="true">↗</span>
+            </button>
+          ))}
+        </div>
+
+        <div class="band-panels">
+          {bands.map((band: any, index: number) => (
+            <article
+              class="band-panel"
+              data-band-panel={band._key}
+              hidden={index !== 0}
+            >
+              {band.image?.url && (
+                <div class="band-panel__image">
+                  <img
+                    src={band.image.url}
+                    alt={band.image.alt || band.title || ""}
+                    width={band.image.dimensions?.width || 1200}
+                    height={band.image.dimensions?.height || 800}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              )}
+
+              <div class="band-panel__content">
+                <p class="eyebrow">CONFIGURATION RANGE</p>
+                <h3>{band.title}</h3>
+
+                {band.lead && (
+                  <p class="band-panel__lead">{band.lead}</p>
+                )}
+
+                {band.copy && <p class="section-copy">{band.copy}</p>}
+
+                {band.models?.length > 0 && (
+                  <div class="band-models">
+                    <span class="band-models__label">Available models</span>
+                    <div class="band-models__list">
+                      {band.models.map((model: string) => (
+                        <span class="band-model">{model}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <a class="text-link" href={primaryCtaUrl}>
+                  Discuss this configuration <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- 8. APPLICATIONS -->
+    {applications.length > 0 && (
+      <section class="section applications-section">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">APPLICATIONS</p>
+            <h2>Designed for your production needs.</h2>
+          </div>
+          <p>
+            Explore the applications and production requirements this machine
+            is configured to support.
+          </p>
+        </div>
+
+        <div class="applications-grid">
+          {applications.map((application: any, index: number) => (
+            <article class="application-card" key={application._key}>
+              {application.image?.url && (
+                <div class="application-card__image">
+                  <img
+                    src={application.image.url}
+                    alt={application.image.alt || application.heading || ""}
+                    width={application.image.dimensions?.width || 800}
+                    height={application.image.dimensions?.height || 600}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              )}
+
+              <div class="application-card__body">
+                <span class="section-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3>{application.heading}</h3>
+                {application.copy && <p>{application.copy}</p>}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- 9. TECHNICAL SPECIFICATIONS -->
+    {models.length > 0 && (
+      <section class="specifications-section" id="specifications">
+        <div class="specifications-section__intro">
+          <p class="eyebrow">TECHNICAL DATA</p>
+          <h2>
+            {product.specifications?.heading || "Technical Specifications"}
+          </h2>
+
+          {product.specifications?.subtitle && (
+            <p class="section-copy">
+              {product.specifications.subtitle}
+            </p>
+          )}
+        </div>
+
+        <div class="specifications-toolbar">
+          <label for="model-selector">Select model</label>
+
+          <select id="model-selector">
+            {models.map((model: any) => (
+              <option
+                value={model._key}
+                selected={model._key === initialModelKey}
+              >
+                {getModelLabel(model)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {models.map((model: any) => {
+          const keySpecs = getKeySpecifications(model);
+          const groups = getSpecificationGroups(model);
+
+          return (
+            <div
+              class="model-specifications"
+              data-model-panel={model._key}
+              hidden={model._key !== initialModelKey}
+            >
+              <div class="selected-model-heading">
+                <div>
+                  <p class="eyebrow">SELECTED CONFIGURATION</p>
+                  <h3>{getModelLabel(model)}</h3>
+                </div>
+              </div>
+
+              {keySpecs.length > 0 && (
+                <div class="key-specifications">
+                  {keySpecs.map((row: any) => (
+                    <article class="key-spec-card" key={row._key}>
+                      <span>{row.label}</span>
+                      <strong>
+                        {[row.value, row.unit].filter(Boolean).join(" ")}
+                      </strong>
+                    </article>
+                  ))}
+                </div>
+              )}
+
+              {groups.length > 0 && (
+                <div class="full-specifications">
+                  <h4>Full technical data</h4>
+
+                  {groups.map((group: any, index: number) => (
+                    <details class="spec-group" open={index === 0}>
+                      <summary>
+                        <span>{group.title}</span>
+                        <span class="spec-group__icon" aria-hidden="true">
+                          +
+                        </span>
+                      </summary>
+
+                      <div class="spec-table-wrap">
+                        <table class="spec-table">
+                          <tbody>
+                            {group.specifications.map((row: any) => (
+                              <tr>
+                                <th scope="row">{row.label}</th>
+                                <td>{row.value}</td>
+                                <td>{row.unit || ""}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              )}
+
+              {!keySpecs.length && !groups.length && (
+                <p class="empty-specs">
+                  Technical specifications for this model have not been added
+                  yet.
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </section>
+    )}
+
+    <!-- Existing rich-text description, rendered as plain text -->
+    {descriptionText && (
+      <section class="section description-section">
+        <p class="eyebrow">MORE ABOUT THE MACHINE</p>
+        <h2>About {product.name}</h2>
+        <p class="section-copy description-section__copy">
+          {descriptionText}
+        </p>
+      </section>
+    )}
+
+    <!-- 10. DOWNLOADS -->
+    {(brochures.length > 0 || foundationUrl) && (
+      <section class="downloads-section">
+        <div>
+          <p class="eyebrow">RESOURCES</p>
+          <h2>Technical resources.</h2>
+          <p class="section-copy">
+            Access product literature and available installation resources.
+          </p>
+        </div>
+
+        <div class="downloads-list">
+          {brochures.map((brochure: any) => (
+            brochure.url && (
+              <a
+                class="download-item"
+                href={brochure.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>
+                  <strong>
+                    {brochure.filename || brochureLabel}
+                  </strong>
+                  <small>Product brochure</small>
+                </span>
+                <span class="download-item__icon" aria-hidden="true">↓</span>
+              </a>
+            )
+          ))}
+
+          {foundationUrl && (
+            <a
+              class="download-item"
+              href={foundationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>
+                <strong>
+                  {product.downloads?.foundationDrawingLabel ||
+                    "Foundation Drawing"}
+                </strong>
+                <small>Installation resource</small>
+              </span>
+              <span class="download-item__icon" aria-hidden="true">↗</span>
+            </a>
+          )}
+        </div>
+      </section>
+    )}
+
+    <!-- FINAL CTA -->
+     {product.finalCta && (
+      <CTA 
+        title={product.finalCta?.heading ?? ''}
+        text={product.finalCta?.copy ?? ''}
+        ctaHref={product.finalCta?.buttonUrl ?? '/#'}
+        ctaLabel={product.finalCta?.buttonLabel ?? 'Contact Us'}
+        image={product.finalCta?.backgroundImage?.url ?? ''}
+        imageAlt={product.finalCta?.backgroundImage?.alt ?? ''}
+      >
+      </CTA>
+      )}
+    
+  </main>
+</Layout>
+
+<script>
+  const setupProductPage = () => {
+    // Model selector
+    document.querySelectorAll<HTMLElement>(".specifications-section").forEach(
+      (section) => {
+        const selector =
+          section.querySelector<HTMLSelectElement>("#model-selector");
+
+        const panels =
+          section.querySelectorAll<HTMLElement>("[data-model-panel]");
+
+        if (!selector) return;
+
+        const updateModel = () => {
+          panels.forEach((panel) => {
+            panel.hidden = panel.dataset.modelPanel !== selector.value;
+          });
+        };
+
+        selector.addEventListener("change", updateModel);
+        updateModel();
+      }
+    );
+
+    // Tonnage band selector
+    document.querySelectorAll<HTMLElement>(".bands-section").forEach(
+      (section) => {
+        const buttons =
+          section.querySelectorAll<HTMLButtonElement>("[data-band-button]");
+
+        const panels =
+          section.querySelectorAll<HTMLElement>("[data-band-panel]");
+
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const selectedBand = button.dataset.bandButton;
+
+            buttons.forEach((item) => {
+              const active = item === button;
+              item.classList.toggle("is-active", active);
+              item.setAttribute("aria-pressed", String(active));
+            });
+
+            panels.forEach((panel) => {
+              panel.hidden = panel.dataset.bandPanel !== selectedBand;
+            });
+          });
+        });
+      }
+    );
+
+    // Specification accordion indicator
+    document.querySelectorAll<HTMLDetailsElement>(".spec-group").forEach(
+      (details) => {
+        const updateIcon = () => {
+          const icon = details.querySelector<HTMLElement>(
+            ".spec-group__icon"
+          );
+
+          if (icon) icon.textContent = details.open ? "−" : "+";
+        };
+
+        details.addEventListener("toggle", updateIcon);
+        updateIcon();
+      }
+    );
+  };
+
+  setupProductPage();
+</script>

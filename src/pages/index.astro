@@ -19,6 +19,9 @@ const hero = page?.sections?.find(
 const splitGridSection = page?.sections?.find(
   (section) => section._type === "splitGridSection"
 );
+const newsSection = page?.sections?.find(
+  (section) => section._type === "newsSection"
+);
 // AI-generated: Read all SEO properties from the Sanity page document
 const seoTitle =
   page?.seo?.metaTitle || page?.title || "Home | Mankoo";
@@ -26,6 +29,7 @@ const seoDescription =
   page?.seo?.metaDescription ||
   page?.title ||
   "";
+const seoKeywords = page?.seo?.metaKeywords || "";
 const canonicalUrl = page?.seo?.canonicalUrl || "/";
 ---
 
@@ -42,6 +46,7 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
       ? { url: page.seo.ogImage.url, alt: page.seo.ogImage.alt }
       : undefined
   }
+  metaKeywords={seoKeywords}
 >
  {hero && (
     <Hero
@@ -59,7 +64,7 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
  <FeaturedProduct />
  <StepGrid />
  <Testimonial />
- <LatestPosts />
+ {newsSection && <LatestPosts section={newsSection} />}
 
 </Layout>
 

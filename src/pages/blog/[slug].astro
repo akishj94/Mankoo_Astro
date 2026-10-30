@@ -1,0 +1,238 @@
+
+---
+import Layout from "../../layouts/Layout.astro";
+import { PortableText } from "@portabletext/astro";
+import { sanityClient } from "sanity:client";
+import {
+  allBlogSlugsQuery,
+  blogPostBySlugQuery,
+} from "../../lib/queries";
+
+export async function getStaticPaths() {
+  const posts = await sanityClient.fetch(allBlogSlugsQuery);
+
+  return posts.map((post: { slug: string }) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/blog");
+}
+
+const post = await sanityClient.fetch(blogPostBySlugQuery, { slug });
+
+if (!post) {
+  return Astro.redirect("/blog");
+}
+
+const seoTitle = post.seo?.metaTitle || post.title;
+const seoDescription = post.seo?.metaDescription || post.excerpt || "";
+const seoKeywords = post.seo?.metaKeywords || "";
+const canonical = post.seo?.canonicalUrl || `/blog/${post.slug}`;
+
+const publishedDate = post.publishedAt
+  ? new Date(post.publishedAt)
+  : null;
+
+
+const validPublishedDate =
+  publishedDate && !Number.isNaN(publishedDate.getTime())
+    ? publishedDate
+    : null;
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+
+const extractTextFromPortableText = (blocks: any[]): string => {
+  if (!blocks || !Array.isArray(blocks)) return "";
+  return blocks
+    .map((block: any) => {
+      if (block._type === "block" && block.children) {
+        return block.children
+          .map((child: any) => child.text || "")
+          .join(" ");
+      }
+      if (block.text) {
+        return block.text;
+      }
+      return "";
+    })
+    .join(" ");
+};
+
+const calculateReadTime = (text: string): number => {
+  const wordsPerMinute = 200;
+  const wordCount = text.split(/\s+/).filter((word) => word.length > 0).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+};
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDescription}
+  canonical={canonical}
+  metaKeywords={seoKeywords}
+>
+  <article class="text-white">
+    <header
+      data-page-intro
+      class="border-b-2 border-[#242B3C]"
+    >
+      <div
+        class="container pb-[clamp(2.5rem,5vw,5rem)] pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem))]"
+      >
+        <a
+          href="/blog"
+          class="inline-flex items-center text-sm text-white/60 transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <span aria-hidden="true" class="mr-2">←</span>
+          Back to blog
+        </a>
+
+        <div class="mt-8 max-w-4xl">
+          {post.categories?.length > 0 && (
+            <ul class="mb-5 flex flex-wrap gap-3" aria-label="Categories">
+              {post.categories.map((category) => (
+                <li
+                  class="text-xs uppercase tracking-[0.12em] text-white/60"
+                  key={category._id}
+                >
+                  {category.title}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <h1
+            class="text-[clamp(2rem,5vw,4.5rem)] leading-[1.05] tracking-tight"
+          >
+            {post.title}
+          </h1>
+
+          {post.excerpt && (
+            <p
+              class="mt-6 max-w-[65ch] text-base leading-relaxed text-white/60 md:text-lg"
+            >
+              {post.excerpt}
+            </p>
+          )}
+
+          
+            <p class="mt-6 text-sm text-white/50 flex items-center gap-x-2">
+              {validPublishedDate && (
+                <time datetime={validPublishedDate.toISOString()}>
+                  {formatDate(validPublishedDate)}
+                </time>
+                <span>·</span>
+              )}
+              <span class="inline-flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="clock-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"></polyline></svg>
+                {calculateReadTime(extractTextFromPortableText(post.body ?? []))} min read
+              </span>
+            </p>
+          
+        </div>
+      </div>
+    </header>
+
+    {post.featuredImage?.url && (
+      <div class="container pt-10 md:pt-16">
+        <figure class="mx-auto max-w-5xl overflow-hidden bg-neutral-100">
+          <img
+            src={post.featuredImage.url}
+            alt={post.featuredImage.alt || post.title}
+            width={post.featuredImage.dimensions?.width || 1600}
+            height={post.featuredImage.dimensions?.height || 1000}
+            fetchpriority="high"
+            decoding="async"
+            class="h-auto max-h-[75vh] w-full object-cover"
+          />
+        </figure>
+      </div>
+    )}
+
+    <div class="container py-12 md:py-20">
+      <div
+        class="prose prose-invert prose-lg mx-auto max-w-3xl
+          prose-headings:tracking-tight
+          prose-a:text-accent prose-a:underline
+          prose-img:my-10 prose-img:h-auto prose-img:w-full
+          prose-blockquote:border-l-accent
+          prose-blockquote:text-white/70"
+      >
+        {post.body?.length > 0 && <PortableText value={post.body} />}
+      </div>
+
+      {post.tags?.length > 0 && (
+        <footer class="mx-auto mt-14 max-w-3xl border-t border-white/15 pt-6">
+          <h2 class="text-sm font-medium text-white/60">Tags</h2>
+
+          <ul class="mt-3 flex flex-wrap gap-2">
+            {post.tags.map((tag: string) => (
+              <li
+                class="border border-white/20 px-3 py-1 text-sm text-white/70"
+                key={tag}
+              >
+                {tag}
+              </li>
+            ))}
+          </ul>
+        </footer>
+      )}
+
+      {post.relatedProducts?.length > 0 && (
+        <aside class="mx-auto mt-16 max-w-3xl border-t border-white/15 pt-10">
+          <h2 class="text-2xl tracking-tight">Related products</h2>
+
+          <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {post.relatedProducts.map((product) => (
+              <a
+                href={`/product/${product.slug}`}
+                class="group block border border-white/15 p-5 transition-colors hover:border-accent"
+                key={product._id}
+              >
+                {product.image?.url && (
+                  <img
+                    src={product.image.url}
+                    alt={product.image.alt || product.name}
+                    loading="lazy"
+                    decoding="async"
+                    class="mb-4 aspect-[4/3] w-full object-cover"
+                  />
+                )}
+
+                <h3 class="text-lg tracking-tight transition-colors group-hover:text-accent">
+                  {product.name}
+                </h3>
+
+                {product.shortDescription && (
+                  <p class="mt-2 text-sm leading-relaxed text-white/60">
+                    {product.shortDescription}
+                  </p>
+                )}
+              </a>
+            ))}
+          </div>
+        </aside>
+      )}
+
+      <div class="mx-auto mt-16 max-w-3xl">
+        <a
+          href="/blog"
+          class="inline-flex items-center text-sm text-white/60 transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <span aria-hidden="true" class="mr-2">←</span>
+          All articles
+        </a>
+      </div>
+    </div>
+  </article>
+</Layout>

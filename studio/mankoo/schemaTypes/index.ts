@@ -13,7 +13,8 @@ import {
   gallerySection,
   ctaBannerSection,
   pageSections,
-  splitGridSection
+  splitGridSection,
+  newsSection
 } from "./objects/pageSections";
 
 import { siteSettings } from "./documents/siteSettings";
@@ -44,7 +45,7 @@ export const schemaTypes = [
   pageSections,
   splitGridSection,
   productSpecifications,
-
+  newsSection,
   // Documents
   siteSettings,
   page,

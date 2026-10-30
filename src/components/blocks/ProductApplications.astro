@@ -1,0 +1,239 @@
+---
+import { sanityClient } from 'sanity:client';
+import 'swiper/css';
+
+import { productBySlugQuery } from '../../lib/queries';
+
+interface ApplicationImage {
+  alt?: string;
+  url?: string;
+  dimensions?: { width: number; height: number };
+  lqip?: string;
+}
+
+interface Application {
+  _key: string;
+  heading: string;
+  copy?: string;
+  image?: ApplicationImage | null;
+}
+
+interface Props {
+  applications?: Application[];
+}
+
+const { applications = [] } = Astro.props;
+
+let items = applications;
+
+// Fallback: fetch the current product's applications when the parent page
+// does not pass them in, so this block stays self-contained.
+if (!items.length) {
+  const { slug } = Astro.params;
+  if (slug) {
+    const product = await sanityClient.fetch(productBySlugQuery, { slug });
+    items = (product?.applications ?? []) as Application[];
+  }
+}
+
+// Do not render this section when there is no data.
+if (!items.length) {
+  return null;
+}
+---
+
+<section
+  data-slider
+  class="py-14 sm:py-16 lg:py-[clamp(76px,5vw,100px)]"
+>
+  <div class="container">
+    <div class="w-full min-w-0 md:max-w-[clamp(55%,70vw,920px)]">
+      <h2
+        class="mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]"
+      >
+        Seven machine families. One standard - They keep running, shift after shift, year after year.
+      </h2>
+    </div>
+
+    <div class="mt-10 sm:mt-14">
+      <div class="swiper" data-slider-root>
+        <ul class="swiper-wrapper">
+          {items.map((app) => (
+            <li class="swiper-slide">
+              <div class="flex h-full flex-col">
+                {app.image?.url && (
+                  <div class="relative aspect-[4/5] w-full overflow-hidden">
+                    <img
+                      src={app.image.url}
+                      alt={app.image.alt || app.heading}
+                      width={app.image.dimensions?.width || 800}
+                      height={app.image.dimensions?.height || 1000}
+                      sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
+                      loading="lazy"
+                      decoding="async"
+                      class="!size-full !object-cover"
+                    />
+                  </div>
+                )}
+
+                <h3 class="mt-5 text-[20px] tracking-tight">
+                  {app.heading}
+                </h3>
+
+                {app.copy && (
+                  <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-white/60">
+                    {app.copy}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="mt-10 flex items-center justify-center gap-6 sm:mt-12 lg:hidden">
+        <div class="slider-pagination flex items-center" data-slider-pagination></div>
+
+        <div class="hidden items-center gap-2">
+          <button
+            type="button"
+            data-slider-prev
+            aria-label="Previous machine"
+            class="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 text-white hover:bg-white/5 disabled:cursor-default disabled:border-white/10 disabled:bg-transparent disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <svg
+              width="15"
+              height="24"
+              viewBox="0 -960 960 960"
+              fill="currentColor"
+              aria-hidden="true"
+              class="-scale-x-100"
+            >
+              <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            data-slider-next
+            aria-label="Next machine"
+            class="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 text-white hover:bg-white/5 disabled:cursor-default disabled:border-white/10 disabled:bg-transparent disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <svg
+              width="15"
+              height="24"
+              viewBox="0 -960 960 960"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .slider-pagination {
+    gap: 0.5rem;
+  }
+
+  .slider-pagination :global(.swiper-pagination-bullet) {
+    appearance: none;
+    width: 1.5rem;
+    height: 0.25rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background-color: rgb(255 255 255 / 0.18);
+    cursor: pointer;
+    transition:
+      width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+      background-color 0.3s ease;
+  }
+
+  .slider-pagination :global(.swiper-pagination-bullet-active) {
+    width: 2.75rem;
+    background-color: var(--color-accent);
+  }
+
+  .slider-pagination :global(.swiper-pagination-bullet:focus-visible) {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  [data-slider] :global(.swiper-button-lock) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slider-pagination :global(.swiper-pagination-bullet) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import Swiper from 'swiper';
+  import { A11y, Keyboard, Navigation, Pagination } from 'swiper/modules';
+
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  );
+
+  document.querySelectorAll<HTMLElement>('[data-slider]').forEach((section) => {
+    const root = section.querySelector<HTMLElement>('[data-slider-root]');
+    const pagination = section.querySelector<HTMLElement>(
+      '[data-slider-pagination]',
+    );
+    const prev = section.querySelector<HTMLButtonElement>('[data-slider-prev]');
+    const next = section.querySelector<HTMLButtonElement>('[data-slider-next]');
+
+    if (!root || !pagination || !prev || !next) return;
+
+    new Swiper(root, {
+      modules: [A11y, Keyboard, Navigation, Pagination],
+      slidesPerView: 1.15,
+      spaceBetween: 8,
+      grabCursor: true,
+      watchOverflow: true,
+      speed: reducedMotion.matches ? 0 : 600,
+      keyboard: {
+        enabled: true,
+        onlyInViewport: true,
+      },
+      a11y: {
+        prevSlideMessage: 'Previous machine',
+        nextSlideMessage: 'Next machine',
+        paginationBulletMessage: 'Go to machine {{index}}',
+        containerRoleDescriptionMessage: 'carousel',
+      },
+      navigation: {
+        prevEl: prev,
+        nextEl: next,
+      },
+      pagination: {
+        el: pagination,
+        clickable: true,
+        bulletElement: 'button',
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 2.15,
+          spaceBetween: 16,
+        },
+        1024: {
+          slidesPerView: 3.15,
+          spaceBetween: 16,
+        },
+        1536: {
+          slidesPerView: 4,
+          spaceBetween: 22,
+        },
+      },
+    });
+  });
+</script>

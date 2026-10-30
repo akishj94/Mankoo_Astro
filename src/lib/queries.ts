@@ -1,4 +1,4 @@
-
+﻿
 /* --------------------------------------------------
    Homepage query
 -------------------------------------------------- */
@@ -34,7 +34,36 @@ export const homepageQuery = `*[
         openInNewTab
       }
     },
-
+    _type == "newsSection" => {
+  title,
+  "posts": *[
+    _type == "post" &&
+    defined(publishedAt) &&
+    publishedAt <= now() &&
+    defined(slug.current)
+  ] | order(publishedAt desc)[0...3] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    publishedAt,
+    "categories": categories[]->{
+      title,
+      "slug": slug.current
+    },
+    "image": featuredImage {
+      alt,
+      "asset": asset->{
+        _id,
+        url,
+        metadata {
+          dimensions,
+          lqip
+        }
+      }
+    }
+  }
+},
     _type == "splitGridSection" => {
       introText,
       highlightText,
@@ -71,9 +100,11 @@ export const homepageQuery = `*[
       }
     }
   },
+ 
   seo {
     metaTitle,
     metaDescription,
+    metaKeywords,
     ogTitle,
     ogDescription,
     ogImage {
@@ -91,25 +122,58 @@ export const homepageQuery = `*[
    Default SEO fallback
 -------------------------------------------------- */
 
+
 export const siteSettingsQuery = `*[
   _type == "siteSettings"
 ][0] {
   siteName,
+
   "logoUrl": logo.asset->url,
   logoAlt,
-  defaultSeo {
-    metaTitle,
-    metaDescription,
-    ogTitle,
-    ogDescription,
-    ogImage {
-      alt,
-      "url": asset->url
-    },
-    canonicalUrl,
-    noIndex
+
+  "footerLogoUrl": footerLogo.asset->url,
+  "footerLogoAlt": FooterlogoAlt,
+
+  whatsAppLink,
+
+  footerNavigation[] {
+    _key,
+    title,
+    menuType,
+    links[] {
+      _key,
+      label,
+      linkType,
+      externalUrl,
+      "internalLink": internalLink->{
+        _type,
+        "slug": slug.current
+      }
+    }
+  },
+
+  socialLinks[] {
+    _key,
+    label,
+    url
+  },
+
+  email,
+  phone,
+  address,
+
+  copyrightText,
+
+  legalLinks[] {
+    _key,
+    label,
+    "internalLink": internalLink->{
+      _type,
+      "slug": slug.current
+    }
   }
 }`;
+
 
 
 /* --------------------------------------------------
@@ -129,6 +193,7 @@ export const productsListingPageQuery = `*[
   seo {
     metaTitle,
     metaDescription,
+metaKeywords,
     ogTitle,
     ogDescription,
     ogImage {
@@ -189,6 +254,7 @@ export const productBySlugQuery = `*[
   },
 
   // Block 1: Hero
+  
   hero {
     eyebrow,
     heading,
@@ -196,9 +262,35 @@ export const productBySlugQuery = `*[
     subLine,
     "backgroundVideo": backgroundVideo.asset->url,
     primaryCtaLabel,
-    primaryCtaUrl,
+    primaryCtaLinkType,
+    primaryCtaInternalLink->{
+      _type,
+      name,
+      title,
+      slug
+    },
+    primaryCtaExternalUrl,
     brochureCtaLabel
   },
+
+  "brochures": brochures[] {
+    _key,
+    label,
+    "file": file {
+      "asset": asset-> {
+        _id,
+        url,
+        originalFilename,
+        mimeType
+      }
+    }
+  },
+
+  downloads {
+    foundationDrawingLabel,
+    foundationDrawingUrl
+  },
+
 
   // Block 2: Pillar cards
   introText,
@@ -235,12 +327,10 @@ export const productBySlugQuery = `*[
     value
   },
 
-  // Blocks 5–6: Feature blocks
+  // Blocks 5â€“6: Feature blocks
   featureBlocks[] {
     _key,
-    featureType,
     heading,
-    hook,
     copy,
     image {
       alt,
@@ -336,13 +426,6 @@ export const productBySlugQuery = `*[
       "lqip": asset->metadata.lqip
     }
   },
-
-  brochures[] {
-    _key,
-    "url": asset->url,
-    "filename": asset->originalFilename
-  },
-
   featured,
   displayOrder,
 
@@ -350,6 +433,7 @@ export const productBySlugQuery = `*[
   seo {
     metaTitle,
     metaDescription,
+metaKeywords,
     ogTitle,
     ogDescription,
     ogImage {
@@ -362,7 +446,7 @@ export const productBySlugQuery = `*[
 }`;
 
 
-/* All product slugs — used by Astro getStaticPaths() */
+/* All product slugs â€” used by Astro getStaticPaths() */
 export const allProductSlugsQuery = `*[
   _type == "product" &&
   defined(slug.current)
@@ -390,9 +474,8 @@ export const allProductsQuery = `*[
   excerpt
 }`;
 
-
 /* --------------------------------------------------
-   Blog listing page
+   Blog listing page settings
 -------------------------------------------------- */
 
 export const blogListingPageQuery = `*[
@@ -408,6 +491,7 @@ export const blogListingPageQuery = `*[
   seo {
     metaTitle,
     metaDescription,
+    metaKeywords,
     ogTitle,
     ogDescription,
     ogImage {
@@ -421,7 +505,8 @@ export const blogListingPageQuery = `*[
 
 
 /* --------------------------------------------------
-   Blog listing: total post count
+   Blog listing: published post count
+   GROQ excludes drafts from normal queries by default.
 -------------------------------------------------- */
 
 export const blogPostsCountQuery = `count(
@@ -445,11 +530,12 @@ export const paginatedBlogPostsQuery = `*[
   "slug": slug.current,
   excerpt,
   publishedAt,
-  mainImage {
+  featuredImage {
     alt,
     "url": asset->url
   },
   categories[]-> {
+    _id,
     title,
     "slug": slug.current
   }
@@ -469,13 +555,9 @@ export const blogPostBySlugQuery = `*[
   "slug": slug.current,
   excerpt,
   publishedAt,
+  updatedAt,
 
-  author-> {
-    name,
-    "image": image.asset->url
-  },
-
-  mainImage {
+  featuredImage {
     alt,
     "url": asset->url,
     "dimensions": asset->metadata.dimensions,
@@ -487,25 +569,42 @@ export const blogPostBySlugQuery = `*[
     _type == "image" => {
       ...,
       "url": asset->url,
-      "alt": alt
+      "dimensions": asset->metadata.dimensions,
+      "lqip": asset->metadata.lqip
     },
     markDefs[] {
       ...,
-      _type == "internalLink" => {
+      _type == "link" => {
         ...,
-        "slug": reference->slug.current
+        href,
+        blank
       }
     }
   },
 
   categories[]-> {
+    _id,
     title,
     "slug": slug.current
+  },
+
+  tags,
+
+  relatedProducts[]-> {
+    _id,
+    name,
+    "slug": slug.current,
+    shortDescription,
+    "image": featuredImage {
+      alt,
+      "url": asset->url
+    }
   },
 
   seo {
     metaTitle,
     metaDescription,
+    metaKeywords,
     ogTitle,
     ogDescription,
     ogImage {
@@ -519,8 +618,8 @@ export const blogPostBySlugQuery = `*[
 
 
 /* --------------------------------------------------
-   All blog slugs
-   Used for static route generation
+   All published blog slugs
+   Used by Astro getStaticPaths()
 -------------------------------------------------- */
 
 export const allBlogSlugsQuery = `*[

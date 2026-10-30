@@ -17,6 +17,7 @@ const defaultSeo = settings?.defaultSeo ?? {};
 // AI-generated: Read all SEO properties with fallback to defaults
 const seoTitle = defaultSeo.metaTitle;
 const seoDescription = defaultSeo.metaDescription || "";
+const seoKeywords = defaultSeo.metaKeywords || "";
 const canonicalUrl = defaultSeo.canonicalUrl || "/about";
 ---
 
@@ -33,6 +34,7 @@ const canonicalUrl = defaultSeo.canonicalUrl || "/about";
       ? { url: defaultSeo.ogImage.url, alt: defaultSeo.ogImage.alt }
       : undefined
   }
+  metaKeywords={seoKeywords}
 >
     <PageIntro
     eyebrow="About Us"

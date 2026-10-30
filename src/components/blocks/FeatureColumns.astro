@@ -1,0 +1,75 @@
+
+---
+interface FeatureBlock {
+  _key?: string;
+  heading?: string;
+  copy?: string;
+  image?: {
+    alt?: string;
+    url?: string;
+    dimensions?: { width: number; height: number };
+    lqip?: string;
+  } | null;
+}
+interface Props {
+  featureBlocks?: FeatureBlock[] | null;
+}
+
+const { featureBlocks = [] } = Astro.props;
+
+const blocks = (featureBlocks ?? []).filter(
+  (block) =>
+    block &&
+    (block.heading || block.hook || block.copy || block.image?.url)
+);
+---
+
+{blocks.length > 0 && (
+  <section class="relative overflow-hidden py-12 text-white lg:py-20">
+    <div class="container">
+      <div class="grid grid-cols-1 items-start gap-5 lg:grid-cols-2 lg:gap-4">
+        {blocks.map((block, index) => (
+          <article
+            class:list={[
+              "group relative isolate min-h-[440px] overflow-hidden bg-[#080b10] sm:min-h-[520px] lg:min-h-[625px]",
+              index % 2 === 1 && "lg:mt-32",
+            ]}>
+            {/* Background image */}
+            {block.image?.url && (
+              <img
+                src={block.image.url}
+                alt={block.image.alt || block.heading || "Feature"}
+                width={block.image.dimensions?.width || 1200}
+                height={block.image.dimensions?.height || 900}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                loading={index < 2 ? "eager" : "lazy"}
+                decoding="async"
+                class="aspect-[1/1] absolute inset-0 -z-20 size-full object-cover object-center"
+              />
+            )}
+           
+            {/* Heading */}
+            <div class="relative z-10 flex min-h-[440px] flex-col justify-between p-6 sm:min-h-[520px] sm:p-8 lg:min-h-[700px] lg:p-8 xl:p-10">
+              <div class="max-w-[75%]">                
+                {block.heading && (
+                  <h2 class="leading-[1.08] tracking-tight text-[clamp(30px,3.6vw,50.5px)] text-white lg:max-w-[70%]">
+                    {block.heading}
+                  </h2>
+                )}
+              </div>
+
+              {/* Supporting copy */}
+              {block.copy && (
+                <div class="md:max-w-[70%] lg:max-w-[50%]">
+                  <p class="text-white tracking-normal sm:text-sm">
+                    {block.copy}
+                  </p>
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

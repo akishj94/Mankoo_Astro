@@ -1,0 +1,184 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Pagination from "../components/blocks/Pagination.astro";
+import { sanityClient } from "sanity:client";
+import {
+  blogListingPageQuery,
+  blogPostsCountQuery,
+  paginatedBlogPostsQuery,
+} from "../lib/queries";
+
+const DEFAULT_BLOG_POSTS_PER_PAGE = 6;
+
+const [listingPage, totalPosts] = await Promise.all([
+  sanityClient.fetch(blogListingPageQuery),
+  sanityClient.fetch<number>(blogPostsCountQuery),
+]);
+
+const configuredPageSize = Number(listingPage?.itemsPerPage);
+const postsPerPage =
+  Number.isInteger(configuredPageSize) && configuredPageSize > 0
+    ? configuredPageSize
+    : DEFAULT_BLOG_POSTS_PER_PAGE;
+
+const totalPages = Math.max(1, Math.ceil(totalPosts / postsPerPage));
+
+const requestedPage = Number.parseInt(
+  Astro.url.searchParams.get("page") ?? "1",
+  10,
+);
+
+const page = Math.min(
+  Math.max(Number.isNaN(requestedPage) ? 1 : requestedPage, 1),
+  totalPages,
+);
+
+const pagePosts = await sanityClient.fetch(paginatedBlogPostsQuery, {
+  start: (page - 1) * postsPerPage,
+  end: page * postsPerPage,
+});
+
+const pageUrl = (target: number) =>
+  target <= 1 ? "/blog" : `/blog?page=${target}`;
+
+const listingTitle =
+  listingPage?.listingTitle || listingPage?.title || "Blog";
+const listingDescription = listingPage?.listingDescription || "";
+
+const seoTitle = listingPage?.seo?.metaTitle || listingTitle;
+const seoDescription =
+  listingPage?.seo?.metaDescription || listingDescription;
+const seoKeywords = listingPage?.seo?.metaKeywords || "";
+const canonical = listingPage?.seo?.canonicalUrl || "/blog";
+const eyebrow = 'Blog';
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDescription}
+  canonical={canonical}
+  metaKeywords={seoKeywords}
+>
+
+  <section data-page-intro class="text-white border-b-2 border-[#242B3C]">
+  <div
+    class="container pb-[clamp(2rem,3vw,4rem)] pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem))]"
+  >
+    <div
+      class="grid grid-cols-1 gap-y-10 lg:grid-cols-[minmax(0,42%)_minmax(0,min(26%,_30rem))] lg:items-end lg:gap-[clamp(4rem,24vw,34rem)] md:justify-between lg:justify-normal"
+    >
+      <div class="min-w-0">
+        {eyebrow && (
+          <p class="text-[12px] uppercase tracking-[0.2em] text-accent">
+            {eyebrow}
+          </p>
+        )}
+
+        {listingTitle && (
+          <h1
+            class:list={[
+              'max-w-[11em] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]',
+              eyebrow && 'mt-6',
+            ]}
+          >
+            {listingTitle}
+          </h1>
+        )}
+      </div>
+
+     {listingDescription && (
+        <div class="min-w-0">
+            <p            
+            class="text-pretty sm:text-[15px] md:text-[16px] leading-[1.45] text-white/60"
+          >
+            {listingDescription}
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+  <section class="container pt-16 pb-24">
+    {totalPosts === 0 ? (
+      <div class="py-16 text-center">
+        <h2 class="text-2xl font-medium text-ink">No posts available</h2>
+        <p class="mt-4 text-ink/60">
+          No posts have been published yet. Please check back soon.
+        </p>
+      </div>
+    ) : (
+      <>
+        <div
+          class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3 lg:grid-cols-4"
+        >
+          {pagePosts.map((post) => (
+            <article class="group" key={post._id}>
+              <a
+                href={`/blog/${post.slug}`}
+                class="group/post block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                aria-label={`View ${post.title}`}
+              >
+                
+                  <div class="relative aspect-[408.32/237.34] w-full overflow-hidden bg-[radial-gradient(101.56%_101.56%_at_87.18%_7.03%,_#002888_8.85%,_#000A22_100%)]">
+                  {post.featuredImage?.url && (
+                    <img
+                      src={post.featuredImage.url}
+                      alt={post.featuredImage.alt || post.title || ""}
+                      width={800}
+                      height={1000}
+                      loading="lazy"
+                      decoding="async"
+                      class="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/post:scale-110 group-focus-visible/post:scale-110"
+                    />
+                    )}
+                  </div>
+                
+                  <p class="mt-6 text-[11px] uppercase tracking-[0.2em] text-white/50 light:text-ink/60 flex items-center gap-x-2">
+                    {post.publishedAt && !isNaN(new Date(post.publishedAt).getTime()) && (
+                      <>
+                        <time datetime={new Date(post.publishedAt).toISOString()}>
+                          {new Date(post.publishedAt).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </time>
+                        {' · '}
+                      </>
+                    )}
+                     <span class="inline-flex items-center gap-1">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="clock-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      {Math.ceil((post.excerpt?.split(' ')?.length || 0) / 200)} min read
+                     </span>
+                    
+                  </p>
+                <h2
+                  class="mt-4 text-[18px] leading-[1.3] tracking-tight text-white light:text-ink transition-colors group-hover:text-accent"
+                >
+                  {post.title}
+                </h2>
+
+                {post.excerpt && (
+                  <p class="mt-2 max-w-[42ch] text-[15px] leading-[1.2] text-white/50">
+                    {post.excerpt}
+                  </p>
+                )}
+              </a>
+            </article>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <nav class="mt-16" aria-label="Blog pagination">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              getHref={pageUrl}
+            />
+          </nav>
+        )}
+      </>
+    )}
+  </section>
+</Layout>

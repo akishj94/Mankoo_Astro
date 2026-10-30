@@ -27,6 +27,13 @@ export const seo = defineType({
       validation: (Rule) => Rule.max(160),
     }),
     defineField({
+      name: "metaKeywords",
+      title: "Meta Keywords",
+      type: "text",
+      rows: 4,
+      group: "search",
+    }),
+    defineField({
       name: "ogTitle",
       title: "Social Title",
       type: "string",

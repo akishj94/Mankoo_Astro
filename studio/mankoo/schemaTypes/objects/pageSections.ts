@@ -485,6 +485,32 @@ export const ctaBannerSection = defineType({
   ],
 });
 
+export const newsSection = defineType({
+  name: "newsSection",
+  title: "News & Stories",
+  type: "object",
+  fields: [
+    defineField({
+      name: "title",
+      title: "Section Title",
+      type: "string",
+      initialValue: "News & Stories",
+      validation: (Rule) => Rule.required(),
+    }),
+  ],
+  preview: {
+    select: {
+      title: "title",
+    },
+    prepare({ title }) {
+      return {
+        title: title || "News & Stories",
+        subtitle: "Displays the 3 latest posts automatically",
+      };
+    },
+  },
+});
+
 export const pageSections = defineType({
   name: "pageSections",
   title: "Page Section",
@@ -498,5 +524,6 @@ export const pageSections = defineType({
     { type: "gallerySection" },
     { type: "ctaBannerSection" },
     { type: "splitGridSection" },
+    { type: "newsSection" },
   ],
 });

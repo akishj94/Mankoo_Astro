@@ -1,0 +1,76 @@
+---
+interface Brochure {
+  _key?: string;
+  label?: string | null;
+  file?: {
+    asset?: {
+      url?: string | null;
+    } | null;
+  } | null;
+  url?: string | null;
+}
+
+interface Props {
+  brochures?: Brochure[] | null;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
+}
+
+const {
+  brochures = [],
+  ctaLabel,
+  ctaHref,
+} = Astro.props;
+
+const validBrochures = (brochures ?? [])
+  .map((brochure) => ({
+    key: brochure._key,
+    label: brochure.label?.trim() || "Download brochure",
+    href: brochure.url?.trim() || brochure.file?.asset?.url?.trim() || "",
+  }))
+  .filter((brochure) => brochure.href);
+
+const primaryLabel =
+  ctaLabel?.trim() || "Explore our machines";
+
+const primaryHref = ctaHref?.trim() || "";
+---
+
+{(validBrochures.length > 0 || primaryHref) && (
+  <div class="container flex flex-wrap items-stretch gap-4 pb-30 md-pb-40">
+    {validBrochures.map((brochure, index) => (
+      <a
+        key={brochure.key ?? index}
+        href={brochure.href}
+        class="inline-flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] shrink-0 flex-col justify-end gap-6 rounded-[6px] bg-[#0b3bff] px-5 pb-4 pt-[4.5rem] text-[15px] text-white transition-colors hover:bg-[#0030e0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:text-[16px]"
+      >
+        <span class="flex w-full items-center justify-between gap-4">
+          {brochure.label}
+          <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="white"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
+        </span>
+      </a>
+    ))}
+
+    {primaryHref && (
+      <a
+        href={primaryHref}
+        class="inline-flex aspect-[6/3] max-h-[140px] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] bg-[rgba(246,246,246,0.2)] px-4 py-4 text-[15px] leading-[1.2] text-white backdrop-blur-[5px] transition-all duration-300 hover:bg-[rgba(246,246,246,0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:hover:bg-[rgba(246,246,246,0.35)] lg:text-[16px] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
+      >
+        <span class="inline-flex max-w-[160px]">
+          {primaryLabel}
+        </span>
+
+        <svg
+          width="15"
+          height="24"
+          class="h-4 w-[15px] shrink-0"
+          viewBox="0 -960 960 960"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+        </svg>
+      </a>
+    )}
+  </div>
+)}

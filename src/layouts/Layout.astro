@@ -2,18 +2,18 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { sanityClient } from "sanity:client";
+import { siteSettingsQuery } from "../lib/queries";
 
 interface Props {
   title?: string;
   description?: string;
-
-  /* -- Product page SEO extensions (optional, additive) -- */
   canonical?: string;
   noindex?: boolean;
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: { url?: string; alt?: string };
-  /* -- end Product page SEO extensions -- */
+  metaKeywords?: string;
 }
 
 const {
@@ -24,7 +24,10 @@ const {
   ogTitle,
   ogDescription,
   ogImage,
+  metaKeywords,
 } = Astro.props;
+
+const settings = await sanityClient.fetch(siteSettingsQuery);
 ---
 
 <!doctype html>
@@ -34,16 +37,17 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#ffffff" />
+    <meta name="keywords" content={metaKeywords} />
 
     <title>{title}</title>
 
-    {/* -- Product page SEO extensions (optional, additive) -- */}
     {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
     {ogTitle && <meta property="og:title" content={ogTitle} />}
     {ogDescription && (
       <meta property="og:description" content={ogDescription} />
     )}
+
     {ogImage?.url && (
       <>
         <meta property="og:image" content={ogImage.url} />
@@ -52,7 +56,6 @@ const {
         )}
       </>
     )}
-    {/* -- end Product page SEO extensions -- */}
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
@@ -64,7 +67,8 @@ const {
       <slot />
     </main>
 
-    <Footer />
+    <Footer settings={settings} />
+
     <script src="../lib/main.js"></script>
   </body>
 </html>

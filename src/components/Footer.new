@@ -1,0 +1,176 @@
+﻿---
+const details = {
+  email: "info@mankoopresses.com",
+  address: "29 / 535, G.T. Road, Opp. Dhandari Kalan Railway Station, Ludhiana - 141010. Punjab. India.",
+  phones: [
+    {
+      number: "+91-7439277777",
+      display: "+91-7439277777",
+    },
+    {
+      number: "+91 9988802100",
+      display: "+91 9988802100",
+    },
+  ],
+  copyright: "Copyrights by Â© Mankoo India Pvt. Ltd. 2025. All rights reserved",
+  legalLinks: [
+    { label: "Privacy Policy", url: "/privacy-policy" },
+    { label: "Terms & Conditions", url: "/terms" },
+  ],
+};
+
+const columns = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Home", url: "/" },
+      { label: "About Us", url: "/about" },
+      { label: "Machines", url: "/machines" },
+      { label: "News", url: "/news" },
+    ],
+  },
+  {
+    title: "Machines",
+    links: [
+      { label: "Excavators", url: "/machines/excavators" },
+      { label: "Wheel Loaders", url: "/machines/wheel-loaders" },
+      { label: "Cranes", url: "/machines/cranes" },
+      { label: "Bulldozers", url: "/machines/bulldozers" },
+    ],
+  },
+  {
+    title: "Connect",
+    links: [
+      { label: "Instagram", url: "https://www.instagram.com/", external:true },
+    { label: "Twitter / X", url: "https://www.x.com/" },
+    ],
+  },
+];
+
+const social = [
+  { label: "Instagram", url: "https://www.instagram.com/" },
+  { label: "Facebook", url: "https://www.facebook.com/" },
+  { label: "LinkedIn", url: "https://www.linkedin.com/" },
+];
+
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  details.address
+)}`;
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/10 text-white">
+  <div class="container py-12 md:py-16">
+    <div class="flex flex-col gap-12 lg:flex-row lg:items-start">
+      <!-- Brand and contact information -->
+      <div class="lg:w-72 lg:shrink-0">
+        <a
+          href="/"
+          class="inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <img
+            src="/brand.png"
+            alt="MyBrand"
+            width="140"
+            height="40"
+            loading="lazy"
+            class="h-8 w-auto"
+          />
+        </a>
+
+        <ul class="mt-6 space-y-3 text-sm text-white/60">
+          {details.email && (
+            <li>
+              <a
+                href={`mailto:${details.email}`}
+                class="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+              >
+                {details.email}
+              </a>
+            </li>
+          )}
+
+          {details.address && (
+            <li>
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block max-w-[34ch] transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+              >
+                {details.address}
+              </a>
+            </li>
+          )}
+
+          {details.phones.map((phone) => (
+            <li>
+              <a
+                href={`tel:${phone.number}`}
+                class="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+              >
+                {phone.display}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Footer navigation -->
+      <div class="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:ml-auto lg:flex lg:gap-x-16">
+        {columns.map((column) => (
+          <nav aria-label={column.title} class="lg:w-40">
+            <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+              {column.title}
+            </h2>
+
+            <ul class="mt-6 space-y-2 text-sm">
+              {column.links.map((link) => (
+                <li>
+                  <a
+                    href={link.url}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    class="inline-block transition-colors hover:text-white/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white light:hover:text-ink/70 light:focus-visible:outline-ink"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+          </nav>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Copyright and legal links -->
+  <div class="border-t border-white/10">
+    <div class="container flex flex-col gap-4 py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        Â© {year} {details.copyright}
+      </p>
+      <p class="text-xs text-white/50">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="clock-icon mr-1"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Last updated: {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+      </p>
+
+      {details.legalLinks.length > 0 && (
+        <ul class="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {details.legalLinks.map((link) => (
+            <li>
+              <a
+                href={link.url}
+                class="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+</footer>

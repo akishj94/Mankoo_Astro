@@ -10,6 +10,7 @@ export const siteSettings = defineType({
     { name: "header", title: "Header & Navigation" },
     { name: "footer", title: "Footer" },
     { name: "contact", title: "Contact Information" },
+    { name: "legal", title: "Legal Information" },
     { name: "seo", title: "Default SEO" },
   ],
   fields: [
@@ -211,55 +212,94 @@ defineField({
   ],
   group: "footer",
 }),
+defineField({
+  name: "copyrightText",
+  title: "Copyright Text",
+  description: "Copyright text displayed in the footer.",
+  type: "string",
+  group: "legal",
+}),
 
-    defineField({
-      name: "socialLinks",
-      title: "Social Links",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "socialLink",
-          fields: [
-            defineField({
-              name: "platform",
-              title: "Platform",
-              type: "string",
-              options: {
-                list: [
-                  { title: "LinkedIn", value: "linkedin" },
-                  { title: "YouTube", value: "youtube" },
-                  { title: "Facebook", value: "facebook" },
-                  { title: "Instagram", value: "instagram" },
-                  { title: "X", value: "x" },
-                ],
-              },
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: "url",
-              title: "URL",
-              type: "url",
-              validation: (Rule) => Rule.required(),
-            }),
+defineField({
+  name: "legalLinks",
+  title: "Legal Links",
+  description: "Add links such as Privacy Policy, Terms & Conditions, etc.",
+  type: "array",
+  of: [
+    {
+      type: "object",
+      name: "legalLink",
+      title: "Legal Link",
+      fields: [
+        defineField({
+          name: "label",
+          title: "Label",
+          type: "string",
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: "internalLink",
+          title: "Internal Link",
+          type: "reference",
+          to: [
+            { type: "page" },
           ],
-          preview: {
-            select: {
-              title: "platform",
-              subtitle: "url",
-            },
-          },
-        },
+          // validation: (Rule) => Rule.required(),
+        }),
       ],
-      group: "footer",
-    }),
-    defineField({
-      name: "email",
-      title: "Contact Email",
-      type: "array",
-      of: [{ type: "string" }],
-      group: "contact",
-    }),
+      preview: {
+        select: {
+          title: "label",
+        },
+        prepare({ title }) {
+          return {
+            title: title || "Untitled Legal Link",
+          };
+        },
+      },
+    },
+  ],
+  group: "legal",
+}),
+defineField({
+  name: "socialLinks",
+  title: "Social Links",
+  type: "array",
+  of: [
+    {
+      type: "object",
+      name: "socialLink",
+      fields: [
+        defineField({
+          name: "label",
+          title: "Label",
+          type: "string",
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: "url",
+          title: "Link",
+          type: "url",
+          // validation: (Rule) => Rule.required(),
+        }),
+      ],
+      preview: {
+        select: {
+          title: "label",
+          subtitle: "url",
+        },
+      },
+    },
+  ],
+  group: "footer",
+}),
+defineField({
+    name: "email",
+    title: "Contact Email",
+    type: "array",
+    of: [{ type: "string" }],
+    group: "contact",
+  }),
     defineField({
       name: "phone",
       title: "Contact Phone",

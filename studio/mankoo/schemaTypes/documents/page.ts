@@ -1,6 +1,5 @@
 
-import { defineField, defineType } from "sanity";
-import {getPublishedId} from 'sanity'
+import { defineField, defineType, getPublishedId } from "sanity";
 
 export const page = defineType({
   name: "page",
@@ -136,7 +135,7 @@ export const page = defineType({
       title: "Items Per Page",
       type: "number",
       initialValue: 12,
-      validation: (Rule) => Rule.required().integer().min(1).max(100),
+      validation: (Rule) => Rule.integer().min(1).max(100),
       hidden: ({ document }) =>
         !["productsListing", "blogListing"].includes(
           document?.pageType as string

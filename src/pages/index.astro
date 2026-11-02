@@ -52,12 +52,12 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
     <Hero
       eyebrow={hero.eyebrow}
       heading={hero.heading}
-      image={hero.image}
+      heroMedia={hero.heroMedia}
       imageAlt={hero.imageAlt}
-      videoUrl={hero.videoUrl}
       primaryCta={hero.primaryCta}
     />
   )}
+  <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
 <SplitGrid section={splitGridSection} />
  <ProductCarousel />
  <GridTabs />
@@ -65,7 +65,7 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
  <StepGrid />
  <Testimonial />
  {newsSection && <LatestPosts section={newsSection} />}
-
+  <div class="border-b border-white/10 "></div>
 </Layout>
 
 

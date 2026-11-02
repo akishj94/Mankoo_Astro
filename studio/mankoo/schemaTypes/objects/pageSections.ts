@@ -221,6 +221,11 @@ export const heroSection = defineType({
     //   rows: 3,
     // }),
     defineField({
+      name: "heroMedia",
+      title: "Background Image/Video",
+      type: "mediaBlock",
+    }),
+    defineField({
       name: "video",
       title: "Background Video",
       type: "file",
@@ -314,41 +319,33 @@ export const richTextSection = defineType({
   ],
 });
 
-export const imageTextSection = defineType({
-  name: "imageTextSection",
-  title: "Image and Text",
+export const mediaBlock = defineType({
+  name: "mediaBlock",
+  title: "Media",
   type: "object",
-  fields: [
+  fields:[
     defineField({
-      name: "heading",
-      title: "Heading",
-      type: "string",
-      validation: (Rule) => Rule.required(),
+      name: "video",
+      title: "Background Video",
+      type: "file",
+      options: {
+        accept: "video/mp4,video/webm",
+      },
+      description:
+        "Optional video. If provided, it takes priority over the image.",
     }),
-    defineField({ name: "content", title: "Content", type: "text", rows: 4 }),
     defineField({
       name: "image",
-      title: "Image",
+      title: "Hero Image",
       type: "image",
       options: { hotspot: true },
-      validation: (Rule) => Rule.required(),
     }),
-    defineField({ name: "imageAlt", title: "Image Alt Text", type: "string" }),
     defineField({
-      name: "imagePosition",
-      title: "Image Position",
+      name: "imageAlt",
+      title: "Image Alt Text",
       type: "string",
-      options: {
-        list: [
-          { title: "Left", value: "left" },
-          { title: "Right", value: "right" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "right",
     }),
-    defineField({ name: "cta", title: "CTA", type: "cta" }),
-  ],
+  ]
 });
 
 export const featureGridSection = defineType({
@@ -518,7 +515,7 @@ export const pageSections = defineType({
   of: [
     { type: "heroSection" },
     { type: "richTextSection" },
-    { type: "imageTextSection" },
+    { type: "mediaBlock" },
     { type: "featureGridSection" },
     { type: "productGridSection" },
     { type: "gallerySection" },

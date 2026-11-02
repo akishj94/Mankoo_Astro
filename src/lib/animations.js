@@ -136,12 +136,19 @@ function initVideoPlayers() {
   });
 }
 
-/** Fixed header — slides away as you scroll down and returns when scrolling up. */
+/**
+ * Header scroll behavior.
+ * Hides on scroll down and reveals on scroll up.
+ */
 function initHeader() {
   const header = document.querySelector('[data-header]');
   if (!header) return;
 
-  const move = gsap.quickTo(header, 'yPercent', { duration: 0.4, ease: 'power3.out' });
+  const move = gsap.quickTo(header, 'yPercent', {
+    duration: 0.4,
+    ease: 'power3.out',
+  });
+
   let lastY = 0;
   let visible = true;
 
@@ -150,103 +157,278 @@ function initHeader() {
       visible = true;
       move(0);
     } else if (Math.abs(y - lastY) > 4) {
-      // 4px threshold keeps trackpad jitter from flickering the header
-      visible = y <= lastY;
+      visible = y < lastY;
       move(visible ? 0 : -100);
     }
 
-    // The scrim is a pseudo-element on the header, so it travels with it. Only
-    // show it while the header is on screen, otherwise a sliver of the gradient
-    // stays pinned to the top of the viewport after it slides away.
     header.toggleAttribute('data-scrolled', visible && y > 8);
     lastY = y;
   }
 
   const lenis = getLenis();
+
   if (lenis) {
     lenis.on('scroll', ({ scroll }) => update(scroll));
   } else {
-    window.addEventListener('scroll', () => update(window.scrollY), { passive: true });
+    window.addEventListener(
+      'scroll',
+      () => update(window.scrollY),
+      { passive: true }
+    );
   }
 }
 
 /**
- * Mobile navigation (below 992px). Slides the panel down from the fixed bar.
+ * Mobile navigation.
+ * Desktop navigation remains untouched.
  */
 function initMobileNav() {
   const header = document.querySelector('[data-header]');
   const toggle = document.querySelector('[data-menu-toggle]');
   const panel = document.querySelector('[data-mobile-nav]');
+
   if (!header || !toggle || !panel) return;
 
   const desktop = window.matchMedia('(min-width: 992px)');
+  const groups = Array.from(
+    panel.querySelectorAll('[data-mobile-group]')
+  );
 
-  // The slide itself is a Tailwind transition on [data-mobile-nav] — all this
-  // needs to do is flip the state attribute that drives it.
-  function setOpen(open) {
+  let isAnimating = false;
+  let menuOpen = false;
+
+  const links = panel.querySelectorAll('a');
+
+  // Initial state
+  gsap.set(links, {
+    autoAlpha: 0,
+    x: -24,
+  });
+
+  function setMenuState(open) {
+    menuOpen = open;
+
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+
     header.toggleAttribute('data-menu-open', open);
   }
 
-  const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+  function resetSubmenus() {
+    groups.forEach((group) => {
+      const button = group.querySelector('[data-mobile-submenu-toggle]');
+      const submenu = group.querySelector('[data-mobile-submenu]');
 
-  toggle.addEventListener('click', () => setOpen(!isOpen()));
+      button?.setAttribute('aria-expanded', 'false');
+      submenu?.setAttribute('hidden', '');
+    });
+  }
 
-  // Don't leave the panel hanging open if the viewport grows past the
-  // breakpoint or the page scrolls away underneath it.
-  desktop.addEventListener('change', (e) => e.matches && setOpen(false));
+  function openMenu() {
+    if (menuOpen || isAnimating || desktop.matches) return;
 
+    setMenuState(true);
+    isAnimating = true;
+
+    gsap.killTweensOf(links);
+
+    gsap.fromTo(
+      links,
+      {
+        autoAlpha: 0,
+        x: -24,
+      },
+      {
+        autoAlpha: 1,
+        x: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        stagger: {
+          amount: 0.35,
+          from: 'start',
+        },
+        onComplete: () => {
+          isAnimating = false;
+        },
+      }
+    );
+  }
+
+  function closeMenu() {
+    if (!menuOpen || isAnimating) return;
+
+    isAnimating = true;
+    setMenuState(false);
+
+    resetSubmenus();
+
+    gsap.killTweensOf(links);
+
+    gsap.to(links, {
+      autoAlpha: 0,
+      x: -24,
+      duration: 0.3,
+      ease: 'power2.in',
+      stagger: {
+        amount: 0.15,
+        from: 'end',
+      },
+      onComplete: () => {
+        isAnimating = false;
+      },
+    });
+  }
+
+  // Menu toggle
+  toggle.addEventListener('click', () => {
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  // Close when desktop breakpoint is reached
+  desktop.addEventListener('change', (event) => {
+    if (event.matches) {
+      gsap.killTweensOf(links);
+      gsap.set(links, {
+        clearProps: 'all',
+      });
+
+      setMenuState(false);
+      resetSubmenus();
+      isAnimating = false;
+    }
+  });
+
+  // Close when scrolling
   const lenis = getLenis();
+
   if (lenis) {
-    lenis.on('scroll', ({ scroll }) => scroll > 4 && isOpen() && setOpen(false));
+    lenis.on('scroll', ({ scroll }) => {
+      if (scroll > 4 && menuOpen) closeMenu();
+    });
   } else {
     window.addEventListener(
       'scroll',
-      () => window.scrollY > 4 && isOpen() && setOpen(false),
+      () => {
+        if (window.scrollY > 4 && menuOpen) closeMenu();
+      },
       { passive: true }
     );
   }
 
-  // Submenu accordions inside the mobile panel — click only, no image. Only
-  // one stays open at a time so the list stays scannable.
-  const groups = Array.from(panel.querySelectorAll('[data-mobile-group]'));
+  // Mobile submenu accordions
+  groups.forEach((group) => {
+    const button = group.querySelector('[data-mobile-submenu-toggle]');
+    const submenu = group.querySelector('[data-mobile-submenu]');
 
-  groups.forEach((groupEl) => {
-    const toggleButton = groupEl.querySelector('[data-mobile-submenu-toggle]');
-    const submenu = groupEl.querySelector('[data-mobile-submenu]');
-    if (!toggleButton || !submenu) return;
+    if (!button || !submenu) return;
 
-    const isExpanded = () => toggleButton.getAttribute('aria-expanded') === 'true';
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') === 'true';
 
-    const setExpanded = (expanded) => {
-      toggleButton.setAttribute('aria-expanded', String(expanded));
-      toggleButton.setAttribute(
-        'aria-label',
-        `${expanded ? 'Hide' : 'Show'} ${groupEl.querySelector('a')?.textContent?.trim() ?? 'submenu'} submenu`
-      );
-      if (expanded) {
-        submenu.removeAttribute('hidden');
-      } else {
-        submenu.setAttribute('hidden', '');
-      }
-    };
-
-    toggleButton.addEventListener('click', () => {
-      const next = !isExpanded();
       groups.forEach((other) => {
-        if (other === groupEl) return;
-        const otherToggle = other.querySelector('[data-mobile-submenu-toggle]');
-        const otherSubmenu = other.querySelector('[data-mobile-submenu]');
-        if (otherToggle && otherSubmenu) {
-          otherToggle.setAttribute('aria-expanded', 'false');
-          otherSubmenu.setAttribute('hidden', '');
-        }
+        if (other === group) return;
+
+        other
+          .querySelector('[data-mobile-submenu-toggle]')
+          ?.setAttribute('aria-expanded', 'false');
+
+        other
+          .querySelector('[data-mobile-submenu]')
+          ?.setAttribute('hidden', '');
       });
-      setExpanded(next);
+
+      button.setAttribute('aria-expanded', String(!expanded));
+
+      if (expanded) {
+        submenu.setAttribute('hidden', '');
+      } else {
+        submenu.removeAttribute('hidden');
+      }
     });
   });
+
+  // Optional global methods for external close/open handlers
+  window.openMobileNav = openMenu;
+  window.closeMobileNav = closeMenu;
 }
+
+/**
+ * (2026-10-31) Header reveal animation — reusable.
+ * 1. Header background fades in.
+ * 2. Each nav link fades and slides in from left to right in a stagger.
+ * Accepts a nav container; defaults to [data-nav]. Can be re-triggered
+ * (e.g. on menu toggle) via window.playHeaderReveal.
+ */
+let headerRevealTL;
+
+function playHeaderReveal(navEl, selector = 'a') {
+  const header = document.querySelector('[data-header]');
+  if (!header || !navEl) return;
+
+  // Kill any in-flight reveal/close so fast re-triggers stay smooth.
+  if (headerRevealTL) headerRevealTL.kill();
+
+  const links = navEl.querySelectorAll(selector);
+
+  // Ensure the header background is fully visible (no flicker on replay).
+  gsap.set(header, { autoAlpha: 1 });
+  // Reset links off-screen left and transparent before the stagger.
+  gsap.set(links, { autoAlpha: 0, x: -24 });
+
+  headerRevealTL = gsap.timeline();
+  headerRevealTL
+    .to(header, { autoAlpha: 1, duration: 0.6, ease: 'power2.out' })
+    .to(
+      links,
+      {
+        autoAlpha: 1,
+        x: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+        stagger: { amount: 0.35, from: 'first' },
+      },
+      0
+    );
+}
+
+/**
+ * (2026-10-31) Header reveal close — animates the nav links out before the
+ * panel closes, so the menu fades/slides out smoothly instead of
+ * disappearing abruptly. The header itself stays visible.
+ */
+function playHeaderClose(navEl, onComplete) {
+  const header = document.querySelector('[data-header]');
+  if (!header || !navEl) { onComplete?.(); return; }
+
+  if (headerRevealTL) headerRevealTL.kill();
+
+  const links = navEl.querySelectorAll('a');
+
+  headerRevealTL = gsap.timeline();
+  headerRevealTL.to(
+    links,
+    {
+      autoAlpha: 0,
+      x: -24,
+      duration: 0.4,
+      ease: 'power2.in',
+      stagger: { amount: 0.2, from: 'last' },
+    }
+  );
+
+  headerRevealTL.eventCallback('onComplete', () => {
+    headerRevealTL = null;
+    onComplete?.();
+  });
+}
+
+
+// Expose so inline handlers (e.g. Header.astro) can re-trigger the reveal.
+window.playHeaderReveal = playHeaderReveal;
 
 export function initAnimations() {
 //   syncScrollTriggerWithLenis();

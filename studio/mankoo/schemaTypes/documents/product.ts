@@ -372,64 +372,77 @@ export const product = defineType({
       ],
     }),
 
-    // Block 7: Tonnage bands
+    // Block 7: Interactive Showcase    
     defineField({
-      name: "tonnageBands",
-      title: "7. Tonnage Selector",
-      type: "array",
+      name: "interactiveShowcase",
+      title: "7. Interactive Showcase",
+      type: "object",
       group: "pageContent",
-      description: "Each band groups models and has a short description.",
-      of: [
-        {
-          type: "object",
-          name: "productTonnageBand",
-          title: "Tonnage Band",
-          fields: [
-            defineField({
-              name: "title",
-              title: "Band Title",
-              type: "string",
-              description: 'Example: "32–40 T".',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: "models",
-              title: "Models",
-              type: "array",
-              of: [{ type: "string" }],
-              description: 'Example: "32", "40".',
-            }),
-            defineField({
-              name: "lead",
-              title: "Bold Lead",
-              type: "string",
-            }),
-            defineField({
-              name: "copy",
-              title: "Supporting Copy",
-              type: "text",
-              rows: 3,
-            }),
-            defineField({
-              name: "image",
-              title: "Machine Image",
-              type: "image",
-              options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "heading",
+          title: "Section Heading",
+          type: "string",
+        }),
+        defineField({
+          name: "tagline",
+          title: "Section Tagline",
+          type: "string",
+        }),
+        defineField({
+          name: "slides",
+          title: "Showcase Slides",
+          type: "array",
+          of: [
+            {
+              type: "object",
+              name: "showcaseSlide",
+              title: "Showcase Slide",
               fields: [
                 defineField({
-                  name: "alt",
-                  title: "Alt Text",
+                  name: "title",
+                  title: "Slide Title",
+                  type: "string",
+                  validation: (Rule) => Rule.required(),
+                }),
+                defineField({
+                  name: "lead",
+                  title: "Bold Lead",
                   type: "string",
                 }),
+                defineField({
+                  name: "copy",
+                  title: "Description",
+                  type: "text",
+                  rows: 3,
+                }),
+                defineField({
+                  name: "image",
+                  title: "Background Image",
+                  type: "image",
+                  options: { hotspot: true },
+                  fields: [
+                    defineField({
+                      name: "alt",
+                      title: "Alt Text",
+                      type: "string",
+                    }),
+                  ],
+                }),
               ],
-            }),
+              preview: {
+                select: {
+                  title: "title",
+                  subtitle: "lead",
+                  media: "image",
+                },
+              },
+            },
           ],
-          preview: {
-            select: { title: "title", subtitle: "lead", media: "image" },
-          },
-        },
+        }),
       ],
     }),
+
 
     // Block 8: Applications carousel
     defineField({
@@ -483,32 +496,32 @@ export const product = defineType({
     // Block 9 is managed by the Technical Specifications group below.
 
     // Block 10: Downloads
-    defineField({
-      name: "downloads",
-      title: "10. Downloads",
-      type: "object",
-      group: "pageContent",
-      fields: [
-        defineField({
-          name: "brochureLabel",
-          title: "Brochure Button Label",
-          type: "string",
-          initialValue: "Download the brochure (PDF)",
-        }),
-        defineField({
-          name: "foundationDrawingLabel",
-          title: "Foundation Drawing Button Label",
-          type: "string",
-          initialValue: "Request a foundation drawing",
-        }),
-        defineField({
-          name: "foundationDrawingUrl",
-          title: "Foundation Drawing Request URL",
-          type: "url",
-          description: "Optional URL for the drawing request form or contact page.",
-        }),
-      ],
-    }),
+    // defineField({
+    //   name: "downloads",
+    //   title: "10. Downloads",
+    //   type: "object",
+    //   group: "pageContent",
+    //   fields: [
+    //     defineField({
+    //       name: "brochureLabel",
+    //       title: "Brochure Button Label",
+    //       type: "string",
+    //       initialValue: "Download the brochure (PDF)",
+    //     }),
+    //     defineField({
+    //       name: "foundationDrawingLabel",
+    //       title: "Foundation Drawing Button Label",
+    //       type: "string",
+    //       initialValue: "Request a foundation drawing",
+    //     }),
+    //     defineField({
+    //       name: "foundationDrawingUrl",
+    //       title: "Foundation Drawing Request URL",
+    //       type: "url",
+    //       description: "Optional URL for the drawing request form or contact page.",
+    //     }),
+    //   ],
+    // }),
 
     // Block 10: Final CTA band
     defineField({

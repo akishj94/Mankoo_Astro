@@ -40,7 +40,9 @@
   max-width: var(--container-max-width);
   margin-inline: auto;
 }
-
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
 /* --------------------------------------------------
    Base styles
 -------------------------------------------------- */

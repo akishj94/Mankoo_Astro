@@ -7,7 +7,7 @@ import {
   specification,
   heroSection,
   richTextSection,
-  imageTextSection,
+  mediaBlock,
   featureGridSection,
   productGridSection,
   gallerySection,
@@ -37,7 +37,7 @@ export const schemaTypes = [
   // Page-builder blocks
   heroSection,
   richTextSection,
-  imageTextSection,
+  mediaBlock,
   featureGridSection,
   productGridSection,
   gallerySection,

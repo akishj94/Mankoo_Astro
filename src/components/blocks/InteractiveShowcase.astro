@@ -1,0 +1,517 @@
+---
+interface ShowcaseImage {
+  alt?: string;
+  url?: string;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  lqip?: string;
+}
+
+interface ShowcaseSlide {
+  _key: string;
+  title: string;
+  lead?: string;
+  copy?: string;
+  image?: ShowcaseImage | null;
+}
+
+interface InteractiveShowcaseProps {
+  heading?: string;
+  tagline?: string;
+  slides?: ShowcaseSlide[];
+}
+
+interface Props {
+  interactiveShowcase?: InteractiveShowcaseProps | null;
+}
+
+const {
+  interactiveShowcase = null,
+} = Astro.props;
+
+const {
+  heading,
+  tagline,
+  slides,
+} = interactiveShowcase || {};
+
+const validSlides = (slides ?? []).filter(
+  (slide) => slide?.image?.url
+);
+
+const hasContent = Boolean(
+  heading || tagline || validSlides.length
+);
+---
+
+{hasContent && (
+  <section
+    class="text-white py-12 lg:py-20"
+    aria-label={heading || "Interactive showcase"}
+  >
+    <div class="container">
+
+      {/* Section introduction */}
+      {(heading || tagline) && (
+        <div class="mb-8 lg:mb-12 grid grid-cols-1 lg:grid-cols-2 gap-6 items-end">
+
+          {heading && (
+            <h2 class="text-[clamp(26px,2.5vw,36px)] leading-[1.2] tracking-tight">
+              <span class="block text-white/60">
+                {heading}
+              </span>
+
+              {tagline && (
+                <span class="block">
+                  {tagline}
+                </span>
+              )}
+            </h2>
+          )}
+
+        </div>
+      )}
+
+      {validSlides.length > 0 && (
+
+        <div
+          class="interactive-showcase relative overflow-hidden isolate"
+          data-showcase
+          data-interval="5000"
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Product showcase"
+        >
+
+          {/* Edited by AI: Single parent grid */}
+          <div class="grid grid-cols-1 gap-y-4 md:gap-y-0 gap-x-4 md:grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-stretch">
+
+            {/* Content column */}
+            <div class="relative z-10 text-white flex flex-col justify-between p-5 sm:p-8 lg:p-10 order-2 md:order-1 min-h-[320px] md:min-h-[420px] bg-white/5">
+
+              {/* Slide navigation */}
+              <nav
+                class="flex flex-col"
+                aria-label="Choose showcase slide"
+              >
+                {validSlides.map((slide, index) => (
+                  <button
+                    type="button"
+                    class={`showcase-nav cursor-pointer text-left !text-[clamp(26px,2.5vw,36px)] leading-[1] tracking-tight transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
+                      index === 0
+                        ? "!text-white !opacity-100"
+                        : "!text-white/50 hover:!text-white/80"
+                    }`}
+                    data-showcase-select
+                    data-index={index}
+                    aria-pressed={index === 0 ? "true" : "false"}
+                  >
+                    {slide.title}
+                  </button>
+                ))}
+              </nav>
+
+              {/* Descriptions */}
+              <div class="mt-10 md:mt-12 relative min-h-[120px]">
+
+                {validSlides.map((slide, index) => (
+                  <div
+                    class={`showcase-copy absolute inset-x-0 bottom-0 border-t border-white/10 pt-5 ${
+                      index === 0
+                        ? "opacity-100"
+                        : "opacity-0 pointer-events-none"
+                    }`}
+                    data-showcase-copy
+                    data-index={index}
+                    aria-hidden={index !== 0 ? "true" : undefined}
+                  >
+
+                    {slide.lead && (
+                      <span class="leading-snug mb-2">
+                        {slide.lead}
+                      </span>
+                    )}
+
+                    {slide.copy && (
+                      <p class="text-white/60 max-w-md">
+                        {slide.copy}
+                      </p>
+                    )}
+
+                  </div>
+                ))}
+
+              </div>
+
+            </div>
+
+            {/* Media column */}
+            <div class="relative w-full aspect-[5/3] md:min-h-[420px] overflow-hidden order-1 md:order-2">
+
+              {validSlides.map((slide, index) => (
+                <div
+                  class={`showcase-image absolute inset-0 ${
+                    index === 0 ? "opacity-100" : "opacity-0"
+                  }`}
+                  data-showcase-image
+                  data-index={index}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={`${index + 1} of ${validSlides.length}: ${slide.title}`}
+                  aria-hidden={index !== 0 ? "true" : undefined}
+                >
+                  <img
+                    src={slide.image?.url}
+                    alt={slide.image?.alt || slide.title}
+                    width={slide.image?.dimensions?.width || 1600}
+                    height={slide.image?.dimensions?.height || 900}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    class="absolute inset-0 w-full !h-full !object-cover"
+                  />
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+
+          {/* Announces manual slide changes only */}
+          <p
+            class="sr-only"
+            data-showcase-status
+            aria-live="polite"
+            aria-atomic="true"
+          ></p>
+
+        </div>
+        /* End edited by AI: Unified responsive showcase wrapper */
+      )}
+
+    </div>
+  </section>
+)}
+
+<script>
+import { gsap } from "gsap";
+
+document.querySelectorAll<HTMLElement>("[data-showcase]").forEach(
+  (showcase) => {
+
+    // Prevent duplicate initialization.
+    if (showcase.dataset.initialized === "true") return;
+    showcase.dataset.initialized = "true";
+
+    const navButtons = Array.from(
+      showcase.querySelectorAll<HTMLButtonElement>(
+        "[data-showcase-select]"
+      )
+    );
+
+    const images = Array.from(
+      showcase.querySelectorAll<HTMLElement>(
+        "[data-showcase-image]"
+      )
+    );
+
+    const descriptions = Array.from(
+      showcase.querySelectorAll<HTMLElement>(
+        "[data-showcase-copy]"
+      )
+    );
+
+    const status = showcase.querySelector<HTMLElement>(
+      "[data-showcase-status]"
+    );
+
+    const total = navButtons.length;
+
+    if (!total) return;
+
+    const interval = Math.max(
+      2000,
+      Number(showcase.dataset.interval) || 5000
+    );
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    let activeIndex = 0;
+    let timer: ReturnType<typeof setInterval> | undefined;
+
+    let isPlaying = !reducedMotion.matches && total > 1;
+    let focusStopped = false;
+    let hovering = false;
+
+    // Edited by AI: Track manual interaction.
+    let userInteracted = false;
+
+    const animationDuration = reducedMotion.matches ? 0 : 0.8;
+
+    // Initial states.
+    gsap.set(images, {
+      autoAlpha: 0,
+    });
+
+    // Edited by AI: Fade-only description animation.
+    gsap.set(descriptions, {
+      autoAlpha: 0,
+    });
+
+    gsap.set(images[0], {
+      autoAlpha: 1,
+    });
+
+    gsap.set(descriptions[0], {
+      autoAlpha: 1,
+    });
+
+    // Autoplay controls.
+    const stopTimer = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = undefined;
+      }
+    };
+
+    const canAutoplay = () => (
+      isPlaying &&
+      !userInteracted &&
+      !focusStopped &&
+      !hovering &&
+      !reducedMotion.matches &&
+      total > 1
+    );
+
+    const startTimer = () => {
+      stopTimer();
+
+      if (!canAutoplay()) return;
+
+      timer = setInterval(() => {
+        showSlide(activeIndex + 1);
+      }, interval);
+    };
+
+    // Update active navigation title.
+    const updateNavigation = (index: number) => {
+        navButtons.forEach((button, i) => {
+            const active = i === index;
+
+            button.setAttribute(
+            "aria-pressed",
+            String(active)
+            );
+
+            // Remove all previous state classes.
+            button.classList.remove(
+            "!text-white",
+            "!opacity-100",
+            "!text-white/50",
+            "!text-white/60",
+            "hover:!text-white/80"
+            );
+
+            // Apply the correct state classes.
+            if (active) {
+            button.classList.add(
+                "!text-white",
+                "!opacity-100"
+            );
+            } else {
+            button.classList.add(
+                "!text-white/50",
+                "hover:!text-white/80"
+            );
+            }
+        });
+        };
+
+    // Switch slides.
+    const showSlide = (index: number, announce = false) => {
+      const nextIndex = (index + total) % total;
+
+      if (nextIndex === activeIndex) return;
+
+      const previousIndex = activeIndex;
+      activeIndex = nextIndex;
+
+      const previousImage = images[previousIndex];
+      const nextImage = images[nextIndex];
+
+      const previousCopy = descriptions[previousIndex];
+      const nextCopy = descriptions[nextIndex];
+
+      // Update accessibility states.
+      previousImage.setAttribute("aria-hidden", "true");
+      nextImage.removeAttribute("aria-hidden");
+
+      previousCopy?.setAttribute("aria-hidden", "true");
+      nextCopy?.removeAttribute("aria-hidden");
+
+      updateNavigation(nextIndex);
+
+      // Prevent overlapping animations.
+      gsap.killTweensOf(
+        [
+          previousImage,
+          nextImage,
+          previousCopy,
+          nextCopy,
+        ].filter(Boolean)
+      );
+
+      // Prepare incoming elements.
+      gsap.set(nextImage, {
+        autoAlpha: 0,
+      });
+
+      // Edited by AI: No vertical movement, opacity only.
+      gsap.set(nextCopy, {
+        autoAlpha: 0,
+      });
+
+      // Image crossfade.
+      gsap.to(previousImage, {
+        autoAlpha: 0,
+        duration: animationDuration,
+        ease: "power2.inOut",
+      });
+
+      gsap.to(nextImage, {
+        autoAlpha: 1,
+        duration: animationDuration,
+        ease: "power2.inOut",
+      });
+
+      // Edited by AI: Fade-only description transition.
+      if (previousCopy) {
+        gsap.to(previousCopy, {
+          autoAlpha: 0,
+          duration: animationDuration * 0.65,
+          ease: "power2.out",
+        });
+      }
+
+      if (nextCopy) {
+        gsap.to(nextCopy, {
+          autoAlpha: 1,
+          duration: animationDuration,
+          ease: "power2.out",
+          delay: reducedMotion.matches ? 0 : 0.1,
+        });
+      }
+
+      // Announce manual changes only.
+      if (announce && status) {
+        status.textContent =
+          `Slide ${nextIndex + 1} of ${total}: ` +
+          navButtons[nextIndex].textContent?.trim();
+      }
+    };
+
+    // Edited by AI: Manual selection permanently stops autoplay.
+    navButtons.forEach((button, index) => {
+      button.addEventListener("click", () => {
+        userInteracted = true;
+        isPlaying = false;
+
+        stopTimer();
+
+        showSlide(index, true);
+      });
+    });
+
+    // Pause when keyboard focus enters.
+    showcase.addEventListener("focusin", () => {
+      focusStopped = true;
+      stopTimer();
+    });
+
+    // Resume when keyboard focus leaves the entire showcase.
+    showcase.addEventListener("focusout", (event) => {
+      const nextTarget = event.relatedTarget as Node | null;
+
+      if (!nextTarget || !showcase.contains(nextTarget)) {
+        focusStopped = false;
+        startTimer();
+      }
+    });
+
+    // Pause on hover.
+    showcase.addEventListener("pointerenter", () => {
+      hovering = true;
+      stopTimer();
+    });
+
+    // Resume when pointer leaves.
+    showcase.addEventListener("pointerleave", () => {
+      hovering = false;
+      startTimer();
+    });
+
+    // Respect reduced motion preferences.
+    const handleMotionPreference = () => {
+      if (reducedMotion.matches) {
+        isPlaying = false;
+        stopTimer();
+
+        gsap.killTweensOf([
+          ...images,
+          ...descriptions,
+        ]);
+
+        gsap.set(images, {
+          autoAlpha: 0,
+        });
+
+        gsap.set(descriptions, {
+          autoAlpha: 0,
+        });
+
+        gsap.set(images[activeIndex], {
+          autoAlpha: 1,
+        });
+
+        gsap.set(descriptions[activeIndex], {
+          autoAlpha: 1,
+        });
+
+      } else if (!userInteracted) {
+        isPlaying = true;
+        startTimer();
+      }
+    };
+
+    reducedMotion.addEventListener(
+      "change",
+      handleMotionPreference
+    );
+
+    // Cleanup.
+    const cleanup = () => {
+      stopTimer();
+
+      reducedMotion.removeEventListener(
+        "change",
+        handleMotionPreference
+      );
+
+      gsap.killTweensOf([
+        ...images,
+        ...descriptions,
+      ]);
+    };
+
+    document.addEventListener("astro:before-swap", cleanup, {
+      once: true,
+    });
+
+    // Initialize autoplay.
+    startTimer();
+  }
+);
+</script>

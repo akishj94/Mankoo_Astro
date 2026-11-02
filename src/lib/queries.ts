@@ -17,15 +17,29 @@ export const homepageQuery = `*[
       eyebrow,
       heading,
       imageAlt,
-      "image": image.asset->{
-        _id,
-        url,
-        metadata {
-          dimensions,
-          lqip
+
+      heroMedia {
+        image {
+          alt,
+          "asset": asset-> {
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          }
+        },
+        video {
+          "asset": asset-> {
+            _id,
+            url,
+            originalFilename,
+            mimeType
+          }
         }
       },
-      "videoUrl": video.asset->url,
+
       primaryCta {
         label,
         linkType,
@@ -34,36 +48,38 @@ export const homepageQuery = `*[
         openInNewTab
       }
     },
+
     _type == "newsSection" => {
-  title,
-  "posts": *[
-    _type == "post" &&
-    defined(publishedAt) &&
-    publishedAt <= now() &&
-    defined(slug.current)
-  ] | order(publishedAt desc)[0...3] {
-    _id,
-    title,
-    "slug": slug.current,
-    excerpt,
-    publishedAt,
-    "categories": categories[]->{
       title,
-      "slug": slug.current
-    },
-    "image": featuredImage {
-      alt,
-      "asset": asset->{
+      "posts": *[
+        _type == "post" &&
+        defined(publishedAt) &&
+        publishedAt <= now() &&
+        defined(slug.current)
+      ] | order(publishedAt desc)[0...3] {
         _id,
-        url,
-        metadata {
-          dimensions,
-          lqip
+        title,
+        "slug": slug.current,
+        excerpt,
+        publishedAt,
+        "categories": categories[]->{
+          title,
+          "slug": slug.current
+        },
+        "image": featuredImage {
+          alt,
+          "asset": asset->{
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          }
         }
       }
-    }
-  }
-},
+    },
+
     _type == "splitGridSection" => {
       introText,
       highlightText,
@@ -100,7 +116,7 @@ export const homepageQuery = `*[
       }
     }
   },
- 
+
   seo {
     metaTitle,
     metaDescription,
@@ -327,7 +343,7 @@ export const productBySlugQuery = `*[
     value
   },
 
-  // Blocks 5â€“6: Feature blocks
+  // Blocks 5 and 6: Feature blocks
   featureBlocks[] {
     _key,
     heading,
@@ -340,20 +356,23 @@ export const productBySlugQuery = `*[
     }
   },
 
-  // Block 7: Tonnage selector
-  tonnageBands[] {
-    _key,
-    title,
-    models,
-    lead,
-    copy,
-    image {
-      alt,
-      "url": asset->url,
-      "dimensions": asset->metadata.dimensions,
-      "lqip": asset->metadata.lqip
-    }
-  },
+  // Block 7: Interactive Showcase
+  interactiveShowcase {
+      heading,
+      tagline,
+      slides[] {
+        _key,
+        title,
+        lead,
+        copy,
+        image {
+          alt,
+          "url": asset->url,
+          "dimensions": asset->metadata.dimensions,
+          "lqip": asset->metadata.lqip
+        }
+      }
+    },
 
   // Block 8: Applications carousel
   applications[] {

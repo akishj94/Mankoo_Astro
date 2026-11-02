@@ -1,16 +1,20 @@
 ---
-
 const {
   eyebrow,
   heading,
-  image,
+  heroMedia,
   imageAlt,
-  videoUrl,
   primaryCta,
 } = Astro.props;
 
+const image = heroMedia?.image;
+const imageUrl = image?.asset?.url;
+const videoUrl = heroMedia?.video?.asset?.url;
+
+const resolvedImageAlt = imageAlt || image?.alt || "";
+
 const hasVideo = Boolean(videoUrl);
-const hasImage = Boolean(image?.url);
+const hasImage = Boolean(imageUrl);
 
 const isExternal = primaryCta?.linkType === "external";
 const ctaHref = isExternal ? primaryCta?.url : primaryCta?.href;
@@ -23,33 +27,32 @@ const ctaLabel = primaryCta?.label || "Discover";
   data-video-player
   data-video-label="background video"
 >
-{imageAlt}
   {hasVideo ? (
-  <video
-    class="absolute inset-0 -z-10 size-full object-cover"
-    src={videoUrl}
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="auto"
-    data-hero-video
-  ></video>
-) : hasImage ? (
-  <img
-    class="absolute inset-0 -z-10 size-full object-cover"
-    src={image.url}
-    alt={imageAlt}
-    loading="eager"
-    fetchpriority="high"
-  />
-): null}
+    <video
+      class="absolute inset-0 -z-10 size-full object-cover"
+      src={videoUrl}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      data-hero-video
+      poster={imageUrl}
+    ></video>
+  ) : hasImage ? (
+    <img
+      class="absolute inset-0 -z-10 size-full object-cover"
+      src={imageUrl}
+      alt={resolvedImageAlt}
+      loading="eager"
+      fetchpriority="high"
+    />
+  ) : null}
 
   <div
     class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-black/50"
     aria-hidden="true"
-  >
-  </div>
+  ></div>
 
   <div class="container relative pb-8 sm:pb-12">
     <div class="flex items-end justify-between gap-6">

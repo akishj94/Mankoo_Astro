@@ -44,11 +44,13 @@ if (!items.length) {
 
 <section
   data-slider
+  aria-labelledby="applications-heading"
   class="py-14 sm:py-16 lg:py-[clamp(76px,5vw,100px)]"
 >
   <div class="container">
     <div class="w-full min-w-0 md:max-w-[clamp(55%,70vw,920px)]">
       <h2
+        id="applications-heading"
         class="mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]"
       >
         Seven machine families. One standard - They keep running, shift after shift, year after year.
@@ -56,16 +58,30 @@ if (!items.length) {
     </div>
 
     <div class="mt-10 sm:mt-14">
-      <div class="swiper" data-slider-root>
-        <ul class="swiper-wrapper">
-          {items.map((app) => (
-            <li class="swiper-slide">
+      <div
+        class="swiper"
+        data-slider-root
+        role="region"
+        aria-roledescription="carousel"
+        aria-labelledby="applications-heading"
+      >
+        <ul
+          class="swiper-wrapper"
+          aria-label="Machine applications"
+        >
+          {items.map((app, index) => (
+            <li
+              class="swiper-slide"
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${index + 1} of ${items.length}: ${app.heading}`}
+            >
               <div class="flex h-full flex-col">
                 {app.image?.url && (
                   <div class="relative aspect-[4/5] w-full overflow-hidden">
                     <img
                       src={app.image.url}
-                      alt={app.image.alt || app.heading}
+                      alt={app.image.alt || ''}
                       width={app.image.dimensions?.width || 800}
                       height={app.image.dimensions?.height || 1000}
                       sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 90vw"
@@ -91,8 +107,15 @@ if (!items.length) {
         </ul>
       </div>
 
-      <div class="mt-10 flex items-center justify-center gap-6 sm:mt-12 lg:hidden">
-        <div class="slider-pagination flex items-center" data-slider-pagination></div>
+      <div
+        class="mt-10 flex items-center justify-center gap-6 sm:mt-12 lg:hidden"
+      >
+        <div
+          class="slider-pagination flex items-center"
+          data-slider-pagination
+          role="group"
+          aria-label="Choose a machine slide"
+        ></div>
 
         <div class="hidden items-center gap-2">
           <button
@@ -101,16 +124,7 @@ if (!items.length) {
             aria-label="Previous machine"
             class="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 text-white hover:bg-white/5 disabled:cursor-default disabled:border-white/10 disabled:bg-transparent disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <svg
-              width="15"
-              height="24"
-              viewBox="0 -960 960 960"
-              fill="currentColor"
-              aria-hidden="true"
-              class="-scale-x-100"
-            >
-              <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
-            </svg>
+            <!-- Existing SVG -->
           </button>
 
           <button
@@ -119,15 +133,7 @@ if (!items.length) {
             aria-label="Next machine"
             class="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 text-white hover:bg-white/5 disabled:cursor-default disabled:border-white/10 disabled:bg-transparent disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <svg
-              width="15"
-              height="24"
-              viewBox="0 -960 960 960"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
-            </svg>
+            <!-- Existing SVG -->
           </button>
         </div>
       </div>
@@ -194,46 +200,63 @@ if (!items.length) {
 
     if (!root || !pagination || !prev || !next) return;
 
-    new Swiper(root, {
-      modules: [A11y, Keyboard, Navigation, Pagination],
-      slidesPerView: 1.15,
-      spaceBetween: 8,
-      grabCursor: true,
-      watchOverflow: true,
-      speed: reducedMotion.matches ? 0 : 600,
-      keyboard: {
-        enabled: true,
-        onlyInViewport: true,
-      },
-      a11y: {
-        prevSlideMessage: 'Previous machine',
-        nextSlideMessage: 'Next machine',
-        paginationBulletMessage: 'Go to machine {{index}}',
-        containerRoleDescriptionMessage: 'carousel',
-      },
-      navigation: {
-        prevEl: prev,
-        nextEl: next,
-      },
-      pagination: {
-        el: pagination,
-        clickable: true,
-        bulletElement: 'button',
-      },
-      breakpoints: {
-        640: {
-          slidesPerView: 2.15,
-          spaceBetween: 16,
-        },
-        1024: {
-          slidesPerView: 3.15,
-          spaceBetween: 16,
-        },
-        1536: {
-          slidesPerView: 4,
-          spaceBetween: 22,
-        },
-      },
-    });
+   new Swiper(root, {
+  modules: [A11y, Keyboard, Navigation, Pagination],
+
+  slidesPerView: 1.15,
+  spaceBetween: 8,
+
+  grabCursor: true,
+  watchOverflow: true,
+
+  speed: reducedMotion.matches ? 0 : 600,
+
+  keyboard: {
+    enabled: true,
+    onlyInViewport: true,
+  },
+
+  a11y: {
+    enabled: true,
+
+    prevSlideMessage: 'Previous machine',
+    nextSlideMessage: 'Next machine',
+
+    firstSlideMessage: 'This is the first machine',
+    lastSlideMessage: 'This is the last machine',
+
+    paginationBulletMessage: 'Go to machine {{index}}',
+
+    containerRoleDescriptionMessage: 'carousel',
+    slideRole: 'group',
+    slideLabelMessage: '{{index}} of {{slidesLength}}',
+  },
+
+  navigation: {
+    prevEl: prev,
+    nextEl: next,
+  },
+
+  pagination: {
+    el: pagination,
+    clickable: true,
+    bulletElement: 'button',
+  },
+
+  breakpoints: {
+    640: {
+      slidesPerView: 2.15,
+      spaceBetween: 16,
+    },
+    1024: {
+      slidesPerView: 3.15,
+      spaceBetween: 16,
+    },
+    1536: {
+      slidesPerView: 4,
+      spaceBetween: 22,
+    },
+  },
+});
   });
 </script>

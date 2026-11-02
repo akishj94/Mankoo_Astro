@@ -14,7 +14,7 @@ import FeatureColumns from "../../components/blocks/FeatureColumns.astro";
 import ButtonGrid from "../../components/blocks/ButtonGrid.astro";
 import ProductStats from "../../components/blocks/ProductStats.astro";
 import ProductApplications from "../../components/blocks/ProductApplications.astro";
-
+import InteractiveShowcase from "../../components/blocks/InteractiveShowcase.astro";
 
 export async function getStaticPaths() {
   const products = await sanityClient.fetch(allProductSlugsQuery);
@@ -133,8 +133,11 @@ const plainText = (blocks: any[] = []) =>
       ></PIllarCards>
 
     <ProductStats productStats={stats} keyNumbers={numbers} />
-
+   
     <FeatureColumns featureBlocks={product.featureBlocks ?? []} />
+     <InteractiveShowcase
+      interactiveShowcase={product.interactiveShowcase}
+    />
     <ProductApplications />
     <ProductSpecifications specifications={product.specifications} />
 
@@ -156,7 +159,6 @@ const plainText = (blocks: any[] = []) =>
       >
       </CTA>
       )}
-      
   </main>
 </Layout>
 

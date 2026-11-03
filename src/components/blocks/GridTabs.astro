@@ -1,104 +1,161 @@
 ---
-import { Image } from 'astro:assets';
-import slide1 from '../../assets/Slide04_28_59 AM 1.png';
-import slide2 from '../../assets/IMG_202.jpg';
+const {
+  eyebrow,
+  heading,
+  interval = 6,
+  slides = [],
+} = Astro.props.section || {};
+
+// Ignore completely empty slides.
+const validSlides = Array.isArray(slides)
+  ? slides.filter((slide) => {
+      return Boolean(
+        slide?.image?.url ||
+        slide?.title?.trim() ||
+        slide?.description?.trim()
+      );
+    })
+  : [];
+
+// Do not render an empty section.
+const hasContent = Boolean(
+  eyebrow?.trim() ||
+  heading?.trim() ||
+  validSlides.length
+);
+
+const transitionInterval =
+  Number.isFinite(Number(interval))
+    ? Math.min(30, Math.max(2, Number(interval)))
+    : 6;
 ---
 
-<section
-  data-image-transition
-  data-interval="6"
-  class="pt-8 pb-[clamp(76px,5vw,100px)] text-white light:text-ink lg:pt-12"
->
-  <div class="container">
-    <div data-reveal>
-      <p class="text-[12px] uppercase tracking-[0.2em] text-accent">Eyebrow text</p>
+{hasContent && (
+  <section
+    data-image-transition
+    data-interval={transitionInterval}
+    class="pt-12 pb-[clamp(76px,5vw,100px)] text-white light:text-ink lg:pt-20"
+    aria-label={heading || eyebrow || "Image showcase"}
+  >
+    <div class="container">
+      {(eyebrow || heading) && (
+        <div data-reveal>
+          {eyebrow && (
+            <p class="text-[12px] uppercase tracking-[0.2em] text-accent">
+              {eyebrow}
+            </p>
+          )}
 
-      <h2 class="mt-6 text-[clamp(26px,2.5vw,36px)] leading-[1.2] tracking-tight md:max-w-[50%]">
-        Section title goes here
-      </h2>
+          {heading && (
+            <h2 class="mt-6 text-[clamp(26px,2.5vw,36px)] leading-[1.2] tracking-tight md:max-w-[50%]">
+              {heading}
+            </h2>
+          )}
+        </div>
+      )}
+
+      {validSlides.length > 0 && (
+        <div class="mt-10 lg:mt-12" data-reveal>
+          <div
+            data-transition-media
+            class="relative aspect-[1122/475] w-full overflow-hidden bg-ink"
+            role="region"
+            aria-label="Featured images"
+            aria-roledescription="carousel"
+          >
+            {validSlides.map((slide, index) => (
+              <div
+                id={`transition-panel-${slide._key || index}`}
+                role="tabpanel"
+                aria-labelledby={`transition-tab-${slide._key || index}`}
+                aria-roledescription="slide"
+                aria-label={`${index + 1} of ${validSlides.length}`}
+                aria-hidden={index !== 0 ? "true" : undefined}
+                data-transition-image
+                class:list={[
+                  "absolute inset-0",
+                  index === 0 && "is-active",
+                ]}
+              >
+                {slide.image?.url && (
+                  <img
+                    src={slide.image.url}
+                    alt={slide.imageAlt || ""}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchpriority={index === 0 ? "high" : "auto"}
+                    class="!size-full object-cover"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {validSlides.length > 1 && (
+            <div
+              data-transition-tabs
+              role="tablist"
+              aria-label="Choose a featured image"
+              aria-orientation="horizontal"
+              class="mt-10 grid grid-cols-1 gap-x-[6%] gap-y-8 sm:mt-12 sm:grid-cols-2"
+            >
+              {validSlides.map((slide, index) => (
+                <button
+                  type="button"
+                  id={`transition-tab-${slide._key || index}`}
+                  data-transition-tab
+                  role="tab"
+                  aria-selected={index === 0 ? "true" : "false"}
+                  aria-controls={`transition-panel-${slide._key || index}`}
+                  tabindex={index === 0 ? 0 : -1}
+                  class="group block w-full cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white light:focus-visible:outline-ink"
+                >
+                  {slide.title && (
+                    <span class="block text-[18px] leading-snug transition-colors group-hover:text-white/80 light:group-hover:text-ink/70">
+                      {slide.title}
+                    </span>
+                  )}
+
+                  {slide.description && (
+                    <span class="mt-3 block max-w-[46ch] text-[13px] leading-[1.45] text-white/50 light:text-ink/60 md:text-[14px] lg:text-[15px]">
+                      {slide.description}
+                    </span>
+                  )}
+
+                  <span
+                    aria-hidden="true"
+                    class="relative mt-8 block h-px w-full bg-white/25 light:bg-ink/15"
+                  >
+                    <span
+                      data-transition-fill
+                      class="absolute top-[-1px] left-0 block h-[3px] w-full origin-left scale-x-0 bg-accent"
+                    ></span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
-
-    <div class="mt-10 lg:mt-12" data-reveal>
-      <div data-transition-media class="relative aspect-[1122/475] w-full overflow-hidden bg-ink">
-        <Image
-          src={slide1}
-          alt="Slide one"
-          widths={[640, 1120, 1680, 2240]}
-          sizes="(min-width: 1536px) 1456px, 94vw"
-          loading="lazy"
-          decoding="async"
-          data-transition-image
-          class="absolute inset-0 size-full object-cover is-active"
-        />
-        <Image
-          src={slide2}
-          alt="Slide two"
-          widths={[640, 1120, 1680, 2240]}
-          sizes="(min-width: 1536px) 1456px, 94vw"
-          loading="eager"
-          decoding="async"
-          aria-hidden="true"
-          data-transition-image
-          class="absolute inset-0 size-full object-cover"
-        />
-      </div>
-
-      <div
-        data-transition-tabs
-        class="mt-10 grid grid-cols-1 gap-x-[6%] gap-y-8 sm:mt-12 sm:grid-cols-2"
-      >
-        <button
-          type="button"
-          data-transition-tab
-          aria-pressed="true"
-          tabindex="0"
-          class="group block w-full cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white light:focus-visible:outline-ink"
-        >
-          <span class="block text-[18px] leading-snug transition-colors group-hover:text-white/80 light:group-hover:text-ink/70">
-            Mechanical power presses
-          </span>
-          <span class="mt-3 block max-w-[46ch] text-[13px] md:text-[14px] lg:text-[15px] leading-[1.45] text-white/50 light:text-ink/60">
-            C-frame, H-frame, cross-shaft and knuckle-joint presses from 10 to 1000 tons, with single or double gear reduction and pneumatic or rolling-key clutches.
-          </span>
-          <span class="relative mt-8 block h-px w-full bg-white/25 light:bg-ink/15">
-            <span data-transition-fill class="absolute top-[-1px] left-0 block h-[3px] w-full origin-left scale-x-0 bg-accent"></span>
-          </span>
-        </button>
-
-        <button
-          type="button"
-          data-transition-tab
-          aria-pressed="false"
-          tabindex="-1"
-          class="group block w-full cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white light:focus-visible:outline-ink"
-        >
-          <span class="block text-[18px] leading-snug transition-colors group-hover:text-white/80 light:group-hover:text-ink/70">
-            Mechanical power presses
-          </span>
-          <span class="mt-3 block max-w-[46ch] text-[13px] md:text-[14px] lg:text-[15px] leading-[1.45] text-white/50 light:text-ink/60">
-            C-frame, H-frame, cross-shaft and knuckle-joint presses from 10 to 1000 tons, with single or double gear reduction and pneumatic or rolling-key clutches.
-          </span>
-          <span class="relative mt-8 block h-px w-full bg-white/25 light:bg-ink/15">
-            <span data-transition-fill class="absolute top-[-1px] left-0 block h-[3px] w-full origin-left scale-x-0 bg-accent"></span>
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
+)}
 
 <style>
-  [data-transition-media] :global([data-transition-image]) {
+  [data-transition-media] [data-transition-image] {
     opacity: 0;
     z-index: 0;
     pointer-events: none;
+    transition: none;
   }
 
-  [data-transition-media] :global([data-transition-image].is-active) {
+  [data-transition-media] [data-transition-image].is-active {
     opacity: 1;
     z-index: 1;
+    pointer-events: auto;
   }
 </style>
+
 
 <script>
   import { gsap } from 'gsap';
@@ -106,77 +163,132 @@ import slide2 from '../../assets/IMG_202.jpg';
   const FADE = 1.2;
 
   document.querySelectorAll<HTMLElement>('[data-image-transition]').forEach((section) => {
+    const media = section.querySelector<HTMLElement>('[data-transition-media]');
+
+    if (!media) return;
+
     const images = Array.from(
-      section.querySelectorAll<HTMLImageElement>('[data-transition-image]')
+      media.querySelectorAll<HTMLElement>('[data-transition-image]')
     );
+
     const tabs = Array.from(
       section.querySelectorAll<HTMLButtonElement>('[data-transition-tab]')
     );
+
     const fills = Array.from(
       section.querySelectorAll<HTMLElement>('[data-transition-fill]')
     );
 
-    if (images.length < 2 || images.length !== tabs.length || fills.length !== tabs.length) {
+    const count = images.length;
+
+    if (count === 0) return;
+
+    // A single image does not need carousel initialization.
+    if (count === 1) {
+      gsap.set(images[0], { opacity: 1 });
+      images[0].classList.add('is-active');
       return;
     }
 
-    const seconds = Number(section.dataset.interval);
-    const duration = seconds > 0 ? seconds : 6;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Validate dynamic slide markup.
+    if (count !== tabs.length || count !== fills.length) return;
+
+    const parsedInterval = Number(section.dataset.interval);
+    const duration = Number.isFinite(parsedInterval)
+      ? Math.min(30, Math.max(2, parsedInterval))
+      : 6;
+
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    );
 
     let index = 0;
     let inView = false;
-    let onScreen = false;
+    let destroyed = false;
+
     let fillTween: gsap.core.Tween | null = null;
+    let transitionTween: gsap.core.Tween | null = null;
 
     function markActive(next: number) {
       index = next;
 
       images.forEach((image, i) => {
-        image.classList.toggle('is-active', i === next);
-        image.setAttribute('aria-hidden', String(i !== next));
+        const active = i === next;
+
+        image.classList.toggle('is-active', active);
+        image.setAttribute('aria-hidden', String(!active));
       });
 
       tabs.forEach((tab, i) => {
-        tab.setAttribute('aria-pressed', String(i === next));
-        tab.tabIndex = i === next ? 0 : -1;
+        const active = i === next;
+
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
       });
     }
 
     function crossfadeTo(next: number) {
-  gsap.killTweensOf(images);
+      transitionTween?.kill();
 
-  const incoming = images[next];
-  const outgoing = images.filter(
-    (image, i) => i !== next && Number(gsap.getProperty(image, 'opacity')) > 0
-  );
+      const incoming = images[next];
 
-  images.forEach((image, i) => {
-    if (i !== next && !outgoing.includes(image)) gsap.set(image, { opacity: 0 });
-  });
+      const outgoing = images.filter(
+        (image, i) =>
+          i !== next &&
+          Number(gsap.getProperty(image, 'opacity')) > 0
+      );
 
-  const start = () =>
-    gsap.fromTo(
-      incoming,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: reduced ? 0 : FADE,
-        ease: 'power1.inOut',
-        onComplete: () => gsap.set(outgoing, { opacity: 0 }),
+      // Keep the incoming image above the outgoing image.
+      gsap.set(incoming, {
+        zIndex: 2,
+        pointerEvents: 'auto',
+      });
+
+      outgoing.forEach((image) => {
+        gsap.set(image, {
+          zIndex: 1,
+          pointerEvents: 'none',
+        });
+      });
+
+      images.forEach((image, i) => {
+        if (i !== next && !outgoing.includes(image)) {
+          gsap.set(image, { opacity: 0 });
+        }
+      });
+
+      const animate = () => {
+        if (destroyed || index !== next) return;
+
+        transitionTween = gsap.to(incoming, {
+          opacity: 1,
+          duration: reducedMotion.matches ? 0 : FADE,
+          ease: 'power1.inOut',
+          overwrite: true,
+          onComplete: () => {
+            gsap.set(outgoing, {
+              opacity: 0,
+              zIndex: 0,
+            });
+          },
+        });
+      };
+
+      const image = incoming.querySelector('img');
+
+      if (image && !image.complete) {
+        image.decode().then(animate).catch(animate);
+      } else {
+        animate();
       }
-    );
-
-  if (incoming.complete) start();
-  else incoming.decode().then(start, start);
-}
+    }
 
     function runFill() {
       fillTween?.kill();
+
       gsap.set(fills, { scaleX: 0 });
 
-      if (reduced || !onScreen) {
-        gsap.set(fills[index], { scaleX: 1 });
+      if (!inView || document.hidden || reducedMotion.matches) {
         return;
       }
 
@@ -184,54 +296,123 @@ import slide2 from '../../assets/IMG_202.jpg';
         scaleX: 1,
         duration,
         ease: 'none',
-        onComplete: () => go(index + 1),
+        onComplete: () => {
+          if (!destroyed) go(index + 1);
+        },
       });
     }
 
     function go(next: number) {
-      const target = (next + tabs.length) % tabs.length;
+      if (destroyed) return;
+
+      const target = (next + count) % count;
+
+      if (target === index) {
+        runFill();
+        return;
+      }
+
       markActive(target);
       crossfadeTo(target);
       runFill();
     }
 
     function syncPlayback() {
-      onScreen = inView && !document.hidden;
-      runFill();
+      if (destroyed) return;
+
+      if (inView && !document.hidden) {
+        runFill();
+      } else {
+        fillTween?.kill();
+        fillTween = null;
+        gsap.set(fills, { scaleX: 0 });
+      }
     }
 
+    // Tab interactions.
     tabs.forEach((tab, i) => {
       tab.addEventListener('click', () => go(i));
 
       tab.addEventListener('keydown', (event) => {
-        const last = tabs.length - 1;
         const targets: Record<string, number> = {
-          ArrowRight: i === last ? 0 : i + 1,
-          ArrowLeft: i === 0 ? last : i - 1,
+          ArrowRight: (i + 1) % count,
+          ArrowLeft: (i - 1 + count) % count,
           Home: 0,
-          End: last,
+          End: count - 1,
         };
+
         const target = targets[event.key];
+
         if (target === undefined) return;
 
         event.preventDefault();
+
         go(target);
         tabs[target].focus();
       });
     });
 
-    new IntersectionObserver(
+    // Pause autoplay when the section leaves the viewport.
+    const observer = new IntersectionObserver(
       ([entry]) => {
         inView = entry.isIntersecting;
         syncPlayback();
       },
       { threshold: 0.25 }
-    ).observe(section);
+    );
+
+    observer.observe(section);
 
     document.addEventListener('visibilitychange', syncPlayback);
 
+    // React to changes in the user's motion preference.
+    const handleMotionChange = () => {
+      if (reducedMotion.matches) {
+        fillTween?.kill();
+        transitionTween?.kill();
+
+        gsap.set(images, { opacity: 0 });
+        gsap.set(images[index], { opacity: 1 });
+        gsap.set(fills, { scaleX: 0 });
+      }
+
+      syncPlayback();
+    };
+
+    reducedMotion.addEventListener('change', handleMotionChange);
+
+    // Initial state.
     markActive(0);
-    gsap.set(images, { opacity: 0 });
-    gsap.set(images[0], { opacity: 1 });
+
+    gsap.set(images, {
+      opacity: 0,
+      zIndex: 0,
+    });
+
+    gsap.set(images[0], {
+      opacity: 1,
+      zIndex: 2,
+      pointerEvents: 'auto',
+    });
+
+    gsap.set(fills, { scaleX: 0 });
+
+    // Cleanup for dynamically removed Astro components.
+    const cleanup = () => {
+      destroyed = true;
+
+      fillTween?.kill();
+      transitionTween?.kill();
+
+      observer.disconnect();
+
+      document.removeEventListener('visibilitychange', syncPlayback);
+      reducedMotion.removeEventListener('change', handleMotionChange);
+
+      gsap.killTweensOf(images);
+      gsap.killTweensOf(fills);
+    };
+
+    section.addEventListener('astro:before-swap', cleanup, { once: true });
   });
 </script>

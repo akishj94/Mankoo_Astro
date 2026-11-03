@@ -1,54 +1,89 @@
-
 ---
 import Layout from "../layouts/Layout.astro";
 import SplitGrid from '../components/blocks/SplitGrid.astro';
-import TeamGrid from '../components/blocks/TeamGrid.astro';
-import TimelineSlider from '../components/blocks/TimelineSlider.astro';
-import CTA from '../components/blocks/CTA.astro';
 import PageIntro from '../components/blocks/PageIntro.astro';
-import VideoBlock from '../components/blocks/VideoBlock.astro';
+import TeamGrid from '../components/blocks/TeamGrid.astro';
+import Timeline from '../components/blocks/TimelineSlider.astro';
+import CTA from '../components/blocks/CTA.astro';
 import { sanityClient } from 'sanity:client';
-import { siteSettingsQuery } from "../lib/queries";
+import { aboutpageQuery } from "../lib/queries";
 
-// AI-generated: Fetch site settings for default SEO fallback
-const settings = await sanityClient.fetch(siteSettingsQuery);
-const defaultSeo = settings?.defaultSeo ?? {};
+const page = await sanityClient.fetch(aboutpageQuery);
 
-// AI-generated: Read all SEO properties with fallback to defaults
-const seoTitle = defaultSeo.metaTitle;
-const seoDescription = defaultSeo.metaDescription || "";
-const seoKeywords = defaultSeo.metaKeywords || "";
-const canonicalUrl = defaultSeo.canonicalUrl || "/about";
+const splitGridSection = page?.sections?.find(
+  (section) => section._type === "splitGridSection"
+);
+const timeLine = page?.sections?.find(
+  (section) => section._type === "timelineSection"
+);
+
+const ctaBannerSection = page?.sections?.find(
+  (section) => section._type === "ctaBannerSection"
+);
+
+const cta = ctaBannerSection?.cta?.link;
+
+const ctaHref =
+  cta?.linkType === "internal"
+    ? cta.href
+      ? `/${cta.href.replace(/^\/+/, "")}`
+      : ""
+    : cta?.externalUrl || "";
+// SEO
+const seoTitle =
+  page?.seo?.metaTitle || page?.title || "Home | Mankoo";
+const seoDescription =
+  page?.seo?.metaDescription ||
+  page?.title ||
+  "";
+const seoKeywords = page?.seo?.metaKeywords || "";
+const canonicalUrl = page?.seo?.canonicalUrl || "/";
 ---
 
 <Layout
   title={seoTitle}
   description={seoDescription}
-  // AI-generated: Pass all SEO properties to the layout
-  canonical={defaultSeo.canonicalUrl || undefined}
-  noindex={defaultSeo.noIndex ?? undefined}
-  ogTitle={defaultSeo.ogTitle ?? undefined}
-  ogDescription={defaultSeo.ogDescription ?? undefined}
+  canonical={page?.seo?.canonicalUrl || undefined}
+  noindex={page?.seo?.noIndex ?? undefined}
+  ogTitle={page?.seo?.ogTitle ?? undefined}
+  ogDescription={page?.seo?.ogDescription ?? undefined}
   ogImage={
-    defaultSeo.ogImage?.url
-      ? { url: defaultSeo.ogImage.url, alt: defaultSeo.ogImage.alt }
+    page?.seo?.ogImage?.url
+      ? { url: page.seo.ogImage.url, alt: page.seo.ogImage.alt }
       : undefined
   }
   metaKeywords={seoKeywords}
 >
+
+  <pre>{JSON.stringify(ctaBannerSection, null, 2)}</pre>
+
     <PageIntro
     eyebrow="About Us"
     title="Since 1974" content={`
 A leading and dedicated Power Presses manufacturing company committed to build long-lasting relationships with local and international business clients. The Mankoo Presses INDIA is a trusted name among the top rated suppliers of power press machines in UAE, Egypt, Iran, Mexico, Saudi Arabia and Middle East countries`}
     headingLevel="h1"
     />
-<VideoBlock
-  src="/landing.mp4"
-  aspectRatio="21 / 9"
-/>
- <SplitGrid />
+
+ {splitGridSection && <SplitGrid section={splitGridSection} />}
  <TeamGrid />
- <TimelineSlider />
- <CTA />
+ {timeLine && (
+    <Timeline
+      eyebrow={timeLine.eyebrow}
+      heading={timeLine.heading}
+      items={timeLine.items}
+      addPlaceholderData={timeLine.addPlaceholderData}
+    />
+  )}
+  {ctaBannerSection && (
+    <CTA
+      title={ctaBannerSection.heading}
+      text={ctaBannerSection.description}
+      ctaHref={ctaHref}
+      ctaLabel={cta?.label}
+      openInNewTab={cta?.openInNewTab}
+      image={ctaBannerSection.backgroundImage?.asset?.url}
+      imageAlt={ctaBannerSection.backgroundImage?.alt}
+    />
+  )}
 
 </Layout>

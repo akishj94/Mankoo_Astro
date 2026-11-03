@@ -1,56 +1,91 @@
 ---
-import { Image } from 'astro:assets';
-import logo from '../../assets/brand.png';
-import portrait from '../../assets/brand.png';
+const { section } = Astro.props;
+
+const quote = section?.quote || "";
+const clientName = section?.clientName || "Client";
+const role = section?.role || "";
+const company = section?.company || "";
+const location = section?.location || "";
+
+const logoUrl = section?.companyLogo?.asset?.url;
+const logoAlt = section?.companyLogo?.alt || `${company || clientName} logo`;
+
+const portraitUrl = section?.portrait?.asset?.url;
+const portraitAlt = section?.portrait?.alt || `Portrait of ${clientName}`;
 ---
 
-<section
-  data-testimonial
-  class="border-b-2 border-[#242B3C] light:border-ink/10 pb-[clamp(76px,5vw,100px)] text-white light:text-ink"
->
-  <div class="container pt-[clamp(48px,4vw,72px)]">
-    <div class="grid grid-cols-1 gap-5 lg:grid-cols-[65fr_35fr]" data-reveal>
-      <div
-        data-testimonial-card
-        class="flex min-h-[380px] flex-col justify-end bg-[radial-gradient(101.56%_101.56%_at_87.18%_7.03%,#002888_8.85%,#000A22_100%)] p-8 sm:p-10 lg:min-h-[540px] lg:p-14"
-      >
-        <div class="max-w-[46ch]">
-          <blockquote class="text-[20px] lg:text-[22px] leading-[1.4] text-white light:text-ink">
-            <p>[Client quote — two lines from a long-standing customer on uptime, build quality and after-sales service.]</p>
-          </blockquote>
+{(quote || section?.clientName) && (
+  <section
+    data-testimonial
+    class="border-b-2 border-[#242B3C] light:border-ink/10 pb-[clamp(76px,5vw,100px)] text-white light:text-ink"
+  >
+    <div class="container pt-[clamp(48px,4vw,72px)]">
+      <div class="grid grid-cols-1 gap-5 lg:grid-cols-[65fr_35fr]" data-reveal>
 
-          <div class="mt-10">
-            <p class="text-[15px] lg:text-[18px] text-[#8F8F8F] light:text-ink">Client name</p>
-            <p class="mt-1 text-[15px] lg:text-[18px] leading-[1.5] text-[#8F8F8F] light:text-ink/60">
-              Role, Company
-              <br />
-              Location
-            </p>
+        <div
+          data-testimonial-card
+          class="order-2 flex min-h-[380px] flex-col justify-end bg-[image:var(--dark-gradient)] p-8 sm:p-10 lg:order-1 lg:min-h-[540px] lg:p-14"
+        >
+          <div class="md:max-w-[80ch]">
+
+            {quote && (
+              <blockquote class="text-[17px] md:text-[20px] leading-[1.4] text-white lg:text-[22px]">
+                <p>{quote}</p>
+              </blockquote>
+            )}
+
+            <div class="mt-10">
+              <p class="text-[15px] text-[#8F8F8F] light:text-ink lg:text-[18px]">
+                {clientName}
+              </p>
+
+              {(role || company || location) && (
+                <p class="mt-1 text-[15px] leading-[1.5] text-[#8F8F8F] light:text-ink/60 lg:text-[18px]">
+                  {role}
+                  {role && company && ", "}
+                  {company}
+                  {location && (
+                    <>
+                      <br />
+                      {location}
+                    </>
+                  )}
+                </p>
+              )}
+            </div>
+
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt={logoAlt}
+                loading="lazy"
+                decoding="async"
+                class="mt-8 h-8 max-w-[180px] object-contain object-left opacity-70"
+              />
+            )}
+
           </div>
-
-          <Image
-            src={logo}
-            alt="Company logo"
-            width={220}
-            height={48}
-            loading="lazy"
-            decoding="async"
-            class="mt-8 h-8 w-auto opacity-70"
-          />
         </div>
-      </div>
 
-      <div class="relative min-h-[300px] overflow-hidden bg-neutral-100 lg:min-h-0">
-        <!-- <Image
-          src={portrait}
-          alt="Person Name"
-          widths={[360, 540, 720]}
-          sizes="(min-width: 1024px) 35vw, 100vw"
-          loading="lazy"
-          decoding="async"
-          class="size-full object-cover"
-        /> -->
+        <div
+          class="relative order-1 min-h-[300px] overflow-hidden bg-neutral-100 lg:order-2 lg:min-h-0"
+        >
+          {portraitUrl ? (
+            <img
+              src={portraitUrl}
+              alt={portraitAlt}
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 size-full object-cover"
+            />
+          ) : (
+            <div class="flex min-h-[300px] size-full items-center justify-center text-sm text-neutral-400">
+              
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
-  </div>
-</section>
+  </section>
+)}

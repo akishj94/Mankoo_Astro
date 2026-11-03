@@ -93,64 +93,9 @@ export const product = defineType({
           options: { accept: "video/*" },
         }),        
         defineField({
-          name: "primaryCtaLabel",
-          title: "Primary Button Label",
-          type: "string",
-          initialValue: "Get a quote",
-        }),
-        defineField({
-          name: "primaryCtaLinkType",
-          title: "Primary Button Link Type",
-          type: "string",
-          options: {
-            list: [
-              { title: "Internal Link", value: "internal" },
-              { title: "External URL", value: "external" },
-            ],
-            layout: "radio",
-          },
-          initialValue: "internal",
-        }),
-        defineField({
-          name: "primaryCtaInternalLink",
-          title: "Primary Button Internal Link",
-          type: "reference",
-          to: [
-            { type: "page" },
-            { type: "product" },
-            { type: "post" },
-          ],
-          hidden: ({ parent }) => parent?.primaryCtaLinkType !== "internal",
-          validation: (Rule) =>
-            Rule.custom((value, context) => {
-              const parent = context.parent as
-                | { primaryCtaLinkType?: string }
-                | undefined;
-
-              if (parent?.primaryCtaLinkType === "internal" && !value) {
-                return "Select an internal destination.";
-              }
-
-              return true;
-            }),
-        }),
-        defineField({
-          name: "primaryCtaExternalUrl",
-          title: "Primary Button External URL",
-          type: "url",
-          hidden: ({ parent }) => parent?.primaryCtaLinkType !== "external",
-          validation: (Rule) =>
-            Rule.custom((value, context) => {
-              const parent = context.parent as
-                | { primaryCtaLinkType?: string }
-                | undefined;
-
-              if (parent?.primaryCtaLinkType === "external" && !value) {
-                return "Enter an external URL.";
-              }
-
-              return true;
-            }),
+          name: "primaryCta",
+          title: "Primary Button",
+          type: "linkObject",
         }),
         
       ],

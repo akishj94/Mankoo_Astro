@@ -6,7 +6,7 @@ import ProductCarousel from '../components/blocks/ProductCarousel.astro';
 import FeaturedProduct from '../components/blocks/FeaturedProduct.astro';
 import GridTabs from '../components/blocks/GridTabs.astro';
 import Testimonial from '../components/blocks/Testimonial.astro';
-import StepGrid from '../components/blocks/StepGrid.astro';
+import FeatureHighlights from '../components/blocks/FeatureHighlights.astro';
 import LatestPosts from '../components/blocks/LatestPosts.astro';
 import { sanityClient } from 'sanity:client';
 import { homepageQuery } from "../lib/queries";
@@ -22,7 +22,32 @@ const splitGridSection = page?.sections?.find(
 const newsSection = page?.sections?.find(
   (section) => section._type === "newsSection"
 );
-// AI-generated: Read all SEO properties from the Sanity page document
+const testimonialSection = page?.sections?.find(
+  (section) => section._type === "testimonialSection"
+);
+const productSlider = page?.sections?.find(
+  (section) => section._type === "productSliderSection"
+);
+const featureHighlightsSection = page?.sections?.find(
+  (section) => section._type === "featureHighlightsSection"
+);
+const featuredProduct = page?.sections?.find(
+  (section) => section._type === "featuredProductSection"
+);
+const imageTransitionSection = page?.sections?.find(
+  (section) => section._type === "imageTransitionSection"
+);
+
+const hasImageTransitionContent = Boolean(
+  imageTransitionSection?.eyebrow?.trim() ||
+  imageTransitionSection?.heading?.trim() ||
+  imageTransitionSection?.slides?.some((slide) =>
+    slide?.image?.url ||
+    slide?.title?.trim() ||
+    slide?.description?.trim()
+  )
+);
+// SEO
 const seoTitle =
   page?.seo?.metaTitle || page?.title || "Home | Mankoo";
 const seoDescription =
@@ -36,7 +61,6 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
 <Layout
   title={seoTitle}
   description={seoDescription}
-  // AI-generated: Pass all SEO properties to the layout
   canonical={page?.seo?.canonicalUrl || undefined}
   noindex={page?.seo?.noIndex ?? undefined}
   ogTitle={page?.seo?.ogTitle ?? undefined}
@@ -57,13 +81,30 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
       primaryCta={hero.primaryCta}
     />
   )}
-  <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
-<SplitGrid section={splitGridSection} />
- <ProductCarousel />
- <GridTabs />
- <FeaturedProduct />
- <StepGrid />
- <Testimonial />
+  
+  <!-- <pre>{JSON.stringify(featuredProduct, null, 2)}</pre> -->
+
+  {splitGridSection && <SplitGrid section={splitGridSection} />}
+  {productSlider && (
+    <ProductCarousel 
+      eyebrow={productSlider.eyebrow}
+      heading={productSlider.heading}
+      products={productSlider.products}
+    />
+  )}
+  {hasImageTransitionContent && (
+    <GridTabs section={imageTransitionSection} />
+  )}
+  
+  
+  {featuredProduct && <FeaturedProduct {...featuredProduct} />}
+
+ {featureHighlightsSection && (
+    <FeatureHighlights section={featureHighlightsSection} />
+  )}
+ {testimonialSection && (
+    <Testimonial section={testimonialSection} />
+  )}
  {newsSection && <LatestPosts section={newsSection} />}
   <div class="border-b border-white/10 "></div>
 </Layout>

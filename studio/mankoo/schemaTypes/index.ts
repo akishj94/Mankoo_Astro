@@ -1,6 +1,7 @@
 
 import { seo } from "./objects/seo";
 import { navigationItem } from "./objects/navigationItem";
+import { linkObject } from "./objects/linkObject";
 import { productSpecifications } from './objects/productSpecifications';
 import {
   cta,
@@ -14,7 +15,13 @@ import {
   ctaBannerSection,
   pageSections,
   splitGridSection,
-  newsSection
+  newsSection,
+  testimonialSection,
+  featuredProductSection,
+  featureHighlightsSection,
+  imageTransitionSection,
+  productSliderSection,
+  timelineSection,
 } from "./objects/pageSections";
 
 import { siteSettings } from "./documents/siteSettings";
@@ -31,6 +38,7 @@ export const schemaTypes = [
   // Shared objects
   seo,
   navigationItem,
+  linkObject,
   cta,
   specification,
 
@@ -46,6 +54,12 @@ export const schemaTypes = [
   splitGridSection,
   productSpecifications,
   newsSection,
+  testimonialSection,
+  featureHighlightsSection,
+  featuredProductSection,
+  imageTransitionSection,
+  productSliderSection,
+  timelineSection,
   // Documents
   siteSettings,
   page,

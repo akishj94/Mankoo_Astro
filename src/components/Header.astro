@@ -2,31 +2,37 @@
 import { sanityClient } from 'sanity:client';
 
   const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]{
-    siteName,
-    "logoUrl": logo.asset->url,
-    "logoAlt": logoAlt,
-    headerNavigation[]{
+  siteName,
+  "logoUrl": logo.asset->url,
+  "logoAlt": logoAlt,
+
+  headerNavigation[]{
+    _key,
+    "label": link.label,
+    "linkType": link.linkType,
+    "externalUrl": link.externalUrl,
+    "openInNewTab": link.openInNewTab,
+    "slug": link.internalLink->slug.current,
+    "isHomepage": link.internalLink->isHomepage,
+
+    children[]{
       _key,
-      label,
-      linkType,
-      externalUrl,
-      "slug": internalLink->slug.current,
-      "isHomepage": internalLink->isHomepage,
-      children[]{
-        _key,
-        label,
-        linkType,
-        externalUrl,
-        "slug": internalLink->slug.current,
-        "isHomepage": internalLink->isHomepage
-      },
-      "megaMenuImages": megaMenuImages[]{
-        "url": asset->url,
-        alt
-      }
+      "label": link.label,
+      "linkType": link.linkType,
+      "externalUrl": link.externalUrl,
+      "openInNewTab": link.openInNewTab,
+      "slug": link.internalLink->slug.current,
+      "isHomepage": link.internalLink->isHomepage
     },
-    whatsAppLink
-  }`);
+
+    "megaMenuImages": megaMenuImages[]{
+      "url": asset->url,
+      alt
+    }
+  },
+
+  whatsAppLink
+}`);
 
   const getUrl = (item) => {
     if (item.linkType === 'external') return item.externalUrl || '#';
@@ -65,7 +71,6 @@ import { sanityClient } from 'sanity:client';
   const panelRow =
     "block rounded-lg transition-colors duration-200 ease-out hover:bg-[#000a22]/5 focus-visible:bg-[#000a22]/5 focus-visible:outline-none motion-reduce:transition-none";
 ---
-
 <header
   data-header
   class="group/header fixed inset-x-0 top-0 z-50 isolate text-white light:text-ink data-[menu-open]:bg-ink data-[menu-open]:light:bg-white data-[menu-open]:text-white data-[menu-open]:light:text-ink before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:-z-[1] before:box-content before:h-full before:pb-[10%] before:bg-linear-to-b before:from-[#000a22] before:to-[#000a2200] before:opacity-0 before:transition-opacity before:duration-300 before:ease-out before:content-[''] before:light:from-white before:light:to-[#ffffff00] data-[scrolled]:before:opacity-40 data-[menu-open]:before:hidden motion-reduce:before:transition-none"

@@ -1,5 +1,4 @@
-﻿
-/* --------------------------------------------------
+﻿/* --------------------------------------------------
    Homepage query
 -------------------------------------------------- */
 
@@ -16,8 +15,6 @@ export const homepageQuery = `*[
     _type == "heroSection" => {
       eyebrow,
       heading,
-      imageAlt,
-
       heroMedia {
         image {
           alt,
@@ -41,14 +38,20 @@ export const homepageQuery = `*[
       },
 
       primaryCta {
-        label,
-        linkType,
-        "href": href->slug.current,
-        url,
-        openInNewTab
+        "label": link.label,
+        "linkType": link.linkType,
+        "href": link.internalLink->slug.current,
+        "url": link.externalUrl,
+        "openInNewTab": link.openInNewTab
       }
     },
-
+    _type == "featureHighlightsSection" => {
+        heading,
+        items[] {
+          _key,
+          title
+        }
+      },
     _type == "newsSection" => {
       title,
       "posts": *[
@@ -79,18 +82,106 @@ export const homepageQuery = `*[
         }
       }
     },
+    _type == "testimonialSection" => {
+        quote,
+        clientName,
+        role,
+        company,
+        location,
 
+        companyLogo {
+          alt,
+          "asset": asset-> {
+            _id,
+            url
+          }
+        },
+
+        portrait {
+          alt,
+          "asset": asset-> {
+            _id,
+            url
+          }
+        }
+      },
+      
+      _type == "featuredProductSection" => {
+        eyebrow,
+        heading,
+        description,
+        "backgroundImage": backgroundImage {
+          alt,
+          "asset": asset->{
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          }
+        },
+        specifications[] {
+          _key,
+          label,
+          value
+        },
+        cta {
+          "label": link.label,
+          "linkType": link.linkType,
+          "href": link.internalLink->slug.current,
+          "url": link.externalUrl,
+          "openInNewTab": link.openInNewTab
+        }
+      },
+    _type == "imageTransitionSection" => {
+        eyebrow,
+        heading,
+        interval,
+        "slides": slides[]{
+          _key,
+          title,
+          description,
+          "image": image.asset->{
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          },
+          "imageAlt": image.alt
+        }
+      },
+      _type == "productSliderSection" => {
+          _key,
+          _type,
+          eyebrow,
+          heading,
+          "products": products[]->{
+            _id,
+            name,
+            shortDescription,
+            "slug": slug.current,
+            "featuredImage": featuredImage {
+              alt,
+              "url": asset->url,
+              "dimensions": asset->metadata.dimensions,
+              "lqip": asset->metadata.lqip
+            }
+          }
+        },
     _type == "splitGridSection" => {
       introText,
       highlightText,
       statistic,
       statisticLabel,
       link {
-        label,
-        linkType,
-        "href": href->slug.current,
-        url,
-        openInNewTab
+        "label": link.label,
+        "linkType": link.linkType,
+        "href": link.internalLink->slug.current,
+        "url": link.externalUrl,
+        "openInNewTab": link.openInNewTab
       },
       smallImage {
         alt,
@@ -113,6 +204,103 @@ export const homepageQuery = `*[
             lqip
           }
         }
+      }
+    }
+  },
+
+  seo {
+    metaTitle,
+    metaDescription,
+    metaKeywords,
+    ogTitle,
+    ogDescription,
+    ogImage {
+      alt,
+      "url": asset->url
+    },
+    canonicalUrl,
+    noIndex
+  }
+}`;
+export const aboutpageQuery = `*[
+  _type == "page" &&
+  slug.current in ["about", "about-us", "our-story"]
+][0] {
+  title,
+  "slug": slug.current,
+
+  sections[] {
+    _type,
+    _key,
+
+    _type == "splitGridSection" => {
+      introText,
+      highlightText,
+      statistic,
+      statisticLabel,
+      link {
+        "label": link.label,
+        "linkType": link.linkType,
+        "href": link.internalLink->slug.current,
+        "url": link.externalUrl,
+        "openInNewTab": link.openInNewTab
+      },
+      smallImage {
+        alt,
+        "asset": asset->{
+          _id,
+          url,
+          metadata {
+            dimensions,
+            lqip
+          }
+        }
+      },
+      largeImage {
+        alt,
+        "asset": asset->{
+          _id,
+          url,
+          metadata {
+            dimensions,
+            lqip
+          }
+        }
+      }    
+    },
+    _type == "ctaBannerSection" => {
+        heading,
+        description,
+        cta {
+          link {
+            label,
+            linkType,
+            "href": internalLink->slug.current,
+            externalUrl,
+            openInNewTab
+          }
+        },
+        backgroundImage {
+          alt,
+          "asset": asset->{
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          }
+        }
+      },
+    _type == "timelineSection" => {
+      eyebrow,
+      heading,
+      addPlaceholderData,
+      items[] {
+        _key,
+        year,
+        title,
+        content
       }
     }
   },

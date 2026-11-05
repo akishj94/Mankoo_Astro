@@ -70,7 +70,12 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
     </div>     
   ) : null}
 
- {splitGridSection && <SplitGrid section={splitGridSection} />}
+{splitGridSection && (
+  <SplitGrid
+    section={splitGridSection}
+    reverseOnMobile={true}
+  />
+)}
  {teamSection && (
   <TeamGrid
     eyebrow={teamSection.eyebrow}

@@ -55,7 +55,7 @@ const sortedColumns = [
         )}
 
         {(emails.length > 0 || phones.length > 0 || settings?.address) && (
-          <ul class="mt-6 space-y-3 sm:text-sm lg:text-[15px] text-white/60">
+          <ul class="mt-6 space-y-3 text-sm lg:text-[15px] text-white/60">
             {emails.filter(Boolean).map((email: string) => (
               <li>
                 <a

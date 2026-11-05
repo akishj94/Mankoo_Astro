@@ -1,7 +1,7 @@
 ---
 import SanityLink from "../SanityLinks.astro";
 
-const { section } = Astro.props;
+const { section, reverseOnMobile = false } = Astro.props;
 
 const smallImageUrl = section?.smallImage?.asset?.url;
 const largeImageUrl = section?.largeImage?.asset?.url;
@@ -18,13 +18,18 @@ const ctaLabel = link?.label;
 
 const hasCta = Boolean(link && ctaLabel?.trim());
 ---
-
 <section
   data-split-grid
   class="bg-[image:var(--dark-gradient-bottom)] py-24 text-white light:text-ink"
 >
   <div class="container grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
-    <div class="grid grid-cols-[61fr_39fr]" data-reveal>
+    <div
+      class:list={[
+        "grid grid-cols-[61fr_39fr]",
+        reverseOnMobile ? "order-2 mt-10 md:order-1 md:mt-0" : "",
+      ]}
+      data-reveal
+    >
       {smallImageUrl && (
         <div class="col-start-2 row-start-1 aspect-[5/6] overflow-hidden">
           <img

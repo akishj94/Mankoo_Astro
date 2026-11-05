@@ -25,21 +25,11 @@ const validCta = Boolean(ctaLink?.label);
 
 const ctaTarget = ctaLink?.openInNewTab ? "_blank" : undefined;
 const ctaRel = ctaLink?.openInNewTab ? "noopener noreferrer" : undefined;
-// PREVIOUS:
-// const ctaHref =
-//   cta?.linkType === "external"
-//     ? cta?.url
-//     : cta?.linkType === "internal" && cta?.href
-//       ? `/${cta.href.replace(/^\/+|\/+$/g, "")}/`
-//       : null;
-// const validCta = Boolean(cta?.label && ctaHref);
-// const ctaTarget = cta?.openInNewTab ? "_blank" : undefined;
-// const ctaRel = cta?.openInNewTab ? "noopener noreferrer" : undefined;
 ---
 {heading && (
   <section data-featured class="text-white">
     <div class="container pt-[clamp(48px,4vw,72px)] pb-[clamp(32px,3vw,56px)]">
-      <div class="w-full min-w-0 md:max-w-[50%]" data-reveal>
+      <div class="w-full min-w-0 md:max-w-[50%]">
         {eyebrow && (
           <p class="text-[14px] uppercase tracking-[0.2em] text-accent">
             {eyebrow}
@@ -78,9 +68,7 @@ const ctaRel = ctaLink?.openInNewTab ? "noopener noreferrer" : undefined;
 
       <div class="relative text-white md:absolute md:inset-x-0 md:bottom-0" data-keep-dark>
         <div
-          class="container pb-10 pt-10 sm:pb-8 sm:pt-12 md:pb-8 md:pt-0 lg:pb-10"
-          data-reveal
-        >
+          class="container pb-10 pt-10 sm:pb-8 sm:pt-12 md:pb-8 md:pt-0 lg:pb-10">
           <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between md:gap-12">
 
             {validSpecifications.length > 0 && (
@@ -119,7 +107,7 @@ const ctaRel = ctaLink?.openInNewTab ? "noopener noreferrer" : undefined;
             {validCta && (
               <SanityLink
                 link={ctaLink}
-                class="inline-flex aspect-[6/3] max-h-[140px] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] bg-[rgba(246,246,246,0.2)] px-4 py-4 text-[15px] leading-[1.2] text-white backdrop-blur-[5px] transition-all duration-250 hover:bg-[rgba(246,246,246,0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:hover:bg-[rgba(246,246,246,0.35)] lg:text-[16px] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
+                class="flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] backdrop-blur-[5rem] bg-white/10 px-4 py-4 text-[15px] leading-[1.2] text-white transition-all duration-250 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[16px] md:hover:bg-[rgba(246,246,246,0.25)] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
               >
                 <span class="inline-flex max-w-[140px] lg:max-w-[160px]">
                   {ctaLink.label}

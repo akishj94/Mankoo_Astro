@@ -25,7 +25,7 @@ const max = 'max-w-[11em]';
     <div
       class="grid grid-cols-1 gap-y-10 lg:grid-cols-[minmax(0,42%)_minmax(0,min(26%,_30rem))] lg:items-end lg:gap-[clamp(4rem,24vw,34rem)] md:justify-between lg:justify-normal"
     >
-      <div class="min-w-0" data-reveal>
+      <div class="min-w-0">
         {eyebrow && (
           <p class="text-[12px] uppercase tracking-[0.2em] text-accent">
             {eyebrow}
@@ -46,7 +46,7 @@ const max = 'max-w-[11em]';
       </div>
 
       {paragraphs.length > 0 && (
-        <div class="min-w-0" data-reveal>
+        <div class="min-w-0">
           {paragraphs.map((paragraph, index) => (
             <p
               class:list={[

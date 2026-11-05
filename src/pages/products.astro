@@ -83,7 +83,7 @@ const eyebrow = 'Machines';
     <div
       class="grid grid-cols-1 gap-y-10 lg:grid-cols-[minmax(0,42%)_minmax(0,min(26%,_30rem))] lg:items-end lg:gap-[clamp(4rem,24vw,34rem)] md:justify-between lg:justify-normal"
     >
-      <div class="min-w-0" data-reveal>
+      <div class="min-w-0">
         {eyebrow && (
           <p class="text-[12px] uppercase tracking-[0.2em] text-accent">
             {eyebrow}
@@ -103,9 +103,8 @@ const eyebrow = 'Machines';
       </div>
 
      {listingDescription && (
-        <div class="min-w-0" data-reveal>
+        <div class="min-w-0">
             <p
-            data-reveal
             class="text-pretty sm:text-[15px] md:text-[16px] leading-[1.45] text-white/60"
           >
             {listingDescription}

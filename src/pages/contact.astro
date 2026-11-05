@@ -86,7 +86,7 @@ const phones = settings?.phone ?? [];
                                     <div key={email}>
                                         <a
                                             href={`mailto:${email}`}
-                                            class="transition-colors hover:text-accent !text-white/60"
+                                            class="transition-colors text-white/60 hover:text-accent"
                                         >
                                             {email}
                                         </a>
@@ -103,7 +103,7 @@ const phones = settings?.phone ?? [];
                                     <div key={phone}>
                                         <a
                                             href={`tel:${phone.replace(/[^\d+]/g, "")}`}
-                                            class="transition-colors !hover:text-accent !text-white/60"
+                                            class="transition-colors text-white/60  hover:text-accent"
                                         >
                                             {phone}
                                         </a>

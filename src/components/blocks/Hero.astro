@@ -1,4 +1,7 @@
 ---
+// LINK RESOLVER
+import { getLinkUrl } from "../../lib/links";
+
 const {
   eyebrow,
   heading,
@@ -16,10 +19,11 @@ const resolvedImageAlt = imageAlt || image?.alt || "";
 const hasVideo = Boolean(videoUrl);
 const hasImage = Boolean(imageUrl);
 
-const isExternal = primaryCta?.linkType === "external";
-const ctaHref = isExternal ? primaryCta?.url : primaryCta?.href;
-const openInNewTab = Boolean(primaryCta?.openInNewTab);
-const ctaLabel = primaryCta?.label || "Discover";
+// LINK RESOLVER: primaryCta is now { link: linkObject }
+const ctaLink = primaryCta?.link;
+const ctaHref = getLinkUrl(ctaLink);
+const openInNewTab = ctaLink?.openInNewTab === true;
+const ctaLabel = ctaLink?.label || "Discover";
 ---
 
 <section

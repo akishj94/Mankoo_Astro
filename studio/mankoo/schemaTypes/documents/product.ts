@@ -88,9 +88,8 @@ export const product = defineType({
         }),
         defineField({
           name: "backgroundVideo",
-          title: "Background Video",
-          type: "file",
-          options: { accept: "video/*" },
+          title: "Background Image/Video",
+          type: "mediaBlock",
         }),        
         defineField({
           name: "primaryCta",
@@ -472,57 +471,8 @@ export const product = defineType({
     defineField({
       name: "finalCta",
       title: "10. Final CTA Band",
-      type: "object",
+      type: "ctaBannerSection",
       group: "pageContent",
-      fields: [
-        defineField({
-          name: "heading",
-          title: "Heading",
-          type: "string",
-          initialValue: "Put this press on your shop floor.",
-        }),
-        defineField({
-          name: "copy",
-          title: "Copy",
-          type: "text",
-          rows: 3,
-        }),
-        defineField({
-          name: "buttonLabel",
-          title: "Button Label",
-          type: "string",
-          initialValue: "Talk to our engineers",
-        }),
-        defineField({
-          name: "buttonUrl",
-          title: "Button URL",
-          type: "url",
-        }),
-        defineField({
-          name: "backgroundImage",
-          title: "CTA Background Image",
-          type: "image",
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: "alt",
-              title: "Alt Text",
-              type: "string",
-            }),
-          ],
-        }),
-        // defineField({
-        //   name: "contactPhone",
-        //   title: "Contact Phone",
-        //   type: "string",
-        // }),
-        // defineField({
-        //   name: "contactEmail",
-        //   title: "Contact Email",
-        //   type: "string",
-        //   validation: (Rule) => Rule.email(),
-        // }),
-      ],
     }),
 
     // Product details

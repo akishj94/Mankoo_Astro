@@ -253,6 +253,12 @@ defineField({
       group: "contact",
     }),
     defineField({
+      name: "map",
+      title: "Google Map URL",
+      type: "url",
+      group: "contact",
+    }),
+    defineField({
       name: "defaultSeo",
       title: "Default SEO",
       type: "seo",

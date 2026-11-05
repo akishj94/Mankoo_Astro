@@ -5,6 +5,8 @@ import {
   productBySlugQuery,
   allProductSlugsQuery,
 } from "../../lib/queries";
+// LINK RESOLVER
+import { getInternalUrl } from "../../lib/links";
 
 import CTA from "../../components/blocks/CTA.astro";
 import PageIntro from "../../components/blocks/PageIntro.astro";
@@ -15,6 +17,7 @@ import ButtonGrid from "../../components/blocks/ButtonGrid.astro";
 import ProductStats from "../../components/blocks/ProductStats.astro";
 import ProductApplications from "../../components/blocks/ProductApplications.astro";
 import InteractiveShowcase from "../../components/blocks/InteractiveShowcase.astro";
+import MediaBlock from "../../components/blocks/MediaBlock.astro";
 
 export async function getStaticPaths() {
   const products = await sanityClient.fetch(allProductSlugsQuery);
@@ -52,16 +55,11 @@ const brochures = (product.brochures ?? []).map((brochure: any) => ({
   file: brochure.file,
 }));
 
+// LINK RESOLVER: internal references go through getInternalUrl() (product, post, page, homepage)
 const primaryCtaHref =
   hero?.primaryCtaLinkType === "external"
     ? hero.primaryCtaExternalUrl
-    : hero?.primaryCtaInternalLink?._type === "product"
-      ? `/product/${hero.primaryCtaInternalLink.slug?.current ?? ""}`
-      : hero?.primaryCtaInternalLink?._type === "post"
-        ? `/blog/${hero.primaryCtaInternalLink.slug?.current ?? ""}`
-        : hero?.primaryCtaInternalLink?._type === "page"
-          ? `/${hero.primaryCtaInternalLink.slug?.current ?? ""}`
-          : undefined;
+    : getInternalUrl(hero?.primaryCtaInternalLink);
 
 
 const stats = product.productStats;
@@ -94,33 +92,11 @@ const plainText = (blocks: any[] = []) =>
       content={hero?.subLine ?? ''}
      >
      </PageIntro>
-
-     
     {/* Product Video */}
     <div class="container">
-      <div class="aspect-[16/8] relative overflow-hidden mt-[calc(clamp(1.5rem,3.5vw,2.5rem)*-1.1)]">
+      <div class="relative overflow-hidden mt-[calc(clamp(1.5rem,3.5vw,2.5rem)*-1.1)]">        
         {hero?.backgroundVideo ? (
-          <video
-            class="absolute inset-0 size-full object-cover"
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            aria-hidden="true"
-          >
-            <source src={hero.backgroundVideo} type="video/mp4" />
-          </video>
-        ) : product.featuredImage?.url ? (
-          <img
-            class="absolute inset-0 size-full object-cover"
-            src={product.featuredImage.url}
-            alt={product.featuredImage.alt || product.name}
-            width={product.featuredImage.dimensions?.width || 1600}
-            height={product.featuredImage.dimensions?.height || 900}
-            fetchpriority="high"
-            decoding="async"
-          />
+          <MediaBlock media={hero.backgroundVideo} aspectRatio="16/9"/>          
         ) : null}
       </div>
     </div>
@@ -143,21 +119,17 @@ const plainText = (blocks: any[] = []) =>
 
     <ButtonGrid
       brochures={brochures}
-      ctaLabel={hero?.primaryCtaLabel}
-      ctaHref={primaryCtaHref}
+      primaryCta={product?.hero?.primaryCta}
     />
-
-    <!-- FINAL CTA -->
+    
      {product.finalCta && (
       <CTA 
-        title={product.finalCta?.heading ?? ''}
-        text={product.finalCta?.copy ?? ''}
-        ctaHref={product.finalCta?.buttonUrl ?? '/#'}
-        ctaLabel={product.finalCta?.buttonLabel ?? 'Contact Us'}
-        image={product.finalCta?.backgroundImage?.url ?? ''}
-        imageAlt={product.finalCta?.backgroundImage?.alt ?? ''}
-      >
-      </CTA>
+          title={product.finalCta?.heading ?? ''}
+          text={product.finalCta?.description ?? ''}
+          link={product.finalCta?.cta?.link ?? ''}
+          image={product.finalCta?.backgroundImage?.asset?.url ?? ''}
+          imageAlt={product.finalCta?.backgroundImage?.alt ?? ''}
+        />
       )}
   </main>
 </Layout>

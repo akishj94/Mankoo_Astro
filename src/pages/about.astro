@@ -5,11 +5,16 @@ import PageIntro from '../components/blocks/PageIntro.astro';
 import TeamGrid from '../components/blocks/TeamGrid.astro';
 import Timeline from '../components/blocks/TimelineSlider.astro';
 import CTA from '../components/blocks/CTA.astro';
+import MediaBlock from "../components/blocks/MediaBlock.astro";
+
 import { sanityClient } from 'sanity:client';
 import { aboutpageQuery } from "../lib/queries";
 
 const page = await sanityClient.fetch(aboutpageQuery);
 
+const pageIntro = page?.sections?.find(
+  (section) => section._type === "pageIntro"
+);
 const splitGridSection = page?.sections?.find(
   (section) => section._type === "splitGridSection"
 );
@@ -20,15 +25,15 @@ const timeLine = page?.sections?.find(
 const ctaBannerSection = page?.sections?.find(
   (section) => section._type === "ctaBannerSection"
 );
+const teamSection = page?.sections?.find(
+  (section) => section._type === "teamSection"
+);
+
+const mediaBlock = page?.sections?.find(
+  (section) => section._type === "mediaBlock"
+);
 
 const cta = ctaBannerSection?.cta?.link;
-
-const ctaHref =
-  cta?.linkType === "internal"
-    ? cta.href
-      ? `/${cta.href.replace(/^\/+/, "")}`
-      : ""
-    : cta?.externalUrl || "";
 // SEO
 const seoTitle =
   page?.seo?.metaTitle || page?.title || "Home | Mankoo";
@@ -54,18 +59,31 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
   }
   metaKeywords={seoKeywords}
 >
-
-  <pre>{JSON.stringify(ctaBannerSection, null, 2)}</pre>
-
-    <PageIntro
-    eyebrow="About Us"
-    title="Since 1974" content={`
-A leading and dedicated Power Presses manufacturing company committed to build long-lasting relationships with local and international business clients. The Mankoo Presses INDIA is a trusted name among the top rated suppliers of power press machines in UAE, Egypt, Iran, Mexico, Saudi Arabia and Middle East countries`}
-    headingLevel="h1"
-    />
+  <PageIntro 
+    eyebrow={pageIntro?.eyebrow ?? ''}
+    title={pageIntro?.heading ?? ''}
+    content={pageIntro?.description ?? ''}
+  />
+  {pageIntro?.introMedia ? (
+    <div class="container">    
+      <MediaBlock media={pageIntro.introMedia} aspectRatio="16/9"/>     
+    </div>     
+  ) : null}
 
  {splitGridSection && <SplitGrid section={splitGridSection} />}
- <TeamGrid />
+ {teamSection && (
+  <TeamGrid
+    eyebrow={teamSection.eyebrow}
+    heading={teamSection.heading}
+    members={teamSection.members}
+    cta={teamSection.cta}
+  />
+)}
+  {mediaBlock && (
+    <div class="container mb-8 lg:mb-12">    
+      <MediaBlock media={mediaBlock} aspectRatio="21/9"/>     
+    </div>     
+  )}
  {timeLine && (
     <Timeline
       eyebrow={timeLine.eyebrow}
@@ -74,13 +92,12 @@ A leading and dedicated Power Presses manufacturing company committed to build l
       addPlaceholderData={timeLine.addPlaceholderData}
     />
   )}
+  {/* LINK RESOLVER: CTA now receives link={cta}. PREVIOUS props: ctaHref={ctaHref} ctaLabel={cta?.label} openInNewTab={cta?.openInNewTab} */}
   {ctaBannerSection && (
     <CTA
       title={ctaBannerSection.heading}
       text={ctaBannerSection.description}
-      ctaHref={ctaHref}
-      ctaLabel={cta?.label}
-      openInNewTab={cta?.openInNewTab}
+      link={cta}
       image={ctaBannerSection.backgroundImage?.asset?.url}
       imageAlt={ctaBannerSection.backgroundImage?.alt}
     />

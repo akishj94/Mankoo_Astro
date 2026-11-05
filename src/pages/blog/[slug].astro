@@ -87,13 +87,15 @@ const calculateReadTime = (text: string): number => {
       class="border-b-2 border-[#242B3C]"
     >
       <div
-        class="container pb-[clamp(2.5rem,5vw,5rem)] pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem))]"
+        class="max-w-3xl mx-auto pb-[clamp(2.5rem,3.5vw,3rem)] pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem))]"
       >
         <a
           href="/blog"
-          class="inline-flex items-center text-sm text-white/60 transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          class="inline-flex items-center text-sm text-white/60 transition-colors duration-300 ease-in-out !hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
-          <span aria-hidden="true" class="mr-2">←</span>
+          <span aria-hidden="true" class="mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16px" width="16px" fill="currentColor"><path d="M10,22L0,12L10,2l1.78,1.77L3.55,12l8.23,8.23L10,22Z"/></svg>
+          </span>
           Back to blog
         </a>
 
@@ -112,7 +114,7 @@ const calculateReadTime = (text: string): number => {
           )}
 
           <h1
-            class="text-[clamp(2rem,5vw,4.5rem)] leading-[1.05] tracking-tight"
+            class="text-[clamp(30px,4vw,56.5px)] font-normal leading-[1.08] tracking-tight"
           >
             {post.title}
           </h1>
@@ -223,16 +225,7 @@ const calculateReadTime = (text: string): number => {
           </div>
         </aside>
       )}
-
-      <div class="mx-auto mt-16 max-w-3xl">
-        <a
-          href="/blog"
-          class="inline-flex items-center text-sm text-white/60 transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        >
-          <span aria-hidden="true" class="mr-2">←</span>
-          All articles
-        </a>
-      </div>
     </div>
   </article>
+  <div class="border-b border-white/10"></div>
 </Layout>

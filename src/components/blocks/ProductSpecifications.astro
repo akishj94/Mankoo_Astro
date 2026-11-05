@@ -299,7 +299,7 @@ const initialGroups = selectedModel?.specificationGroups ?? [];
                     )
                   ) && 'md:col-span-2',
                 ]}
-                open={index === 0}
+                open
               >
                 <summary
                   class="flex cursor-pointer list-none items-center justify-between gap-4 bg-white/5 px-5 py-4  transition-colors hover:bg-white/10 [&::-webkit-details-marker]:hidden"
@@ -513,7 +513,7 @@ const initialGroups = selectedModel?.specificationGroups ?? [];
         isDieCushion || isLastOdd ? 'md:col-span-2' : '',
       ].join(' ');
 
-      details.open = index === 0;
+      details.open = true;
 
       const summary = document.createElement('summary');
       summary.className =

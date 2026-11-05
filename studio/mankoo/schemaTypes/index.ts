@@ -11,7 +11,8 @@ import {
   mediaBlock,
   featureGridSection,
   productGridSection,
-  gallerySection,
+  pageIntro,
+  // gallerySection,
   ctaBannerSection,
   pageSections,
   splitGridSection,
@@ -22,6 +23,7 @@ import {
   imageTransitionSection,
   productSliderSection,
   timelineSection,
+  teamSection,
 } from "./objects/pageSections";
 
 import { siteSettings } from "./documents/siteSettings";
@@ -44,11 +46,12 @@ export const schemaTypes = [
 
   // Page-builder blocks
   heroSection,
+  pageIntro,
   richTextSection,
   mediaBlock,
   featureGridSection,
   productGridSection,
-  gallerySection,
+  // gallerySection,
   ctaBannerSection,
   pageSections,
   splitGridSection,
@@ -60,6 +63,8 @@ export const schemaTypes = [
   imageTransitionSection,
   productSliderSection,
   timelineSection,
+  teamSection,
+
   // Documents
   siteSettings,
   page,

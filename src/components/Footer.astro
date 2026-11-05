@@ -1,4 +1,6 @@
 ---
+import SanityLink from "../components/SanityLinks.astro";
+
 interface Props {
   settings?: any;
 }
@@ -8,6 +10,7 @@ const { settings } = Astro.props;
 const emails = settings?.email ?? [];
 const phones = settings?.phone ?? [];
 const columns = settings?.footerNavigation ?? [];
+
 const socialLinks = settings?.socialLinks ?? [];
 const legalLinks = settings?.legalLinks ?? [];
 
@@ -19,46 +22,24 @@ const logoAlt =
   settings?.siteName ||
   "";
 
-const mapsUrl = settings?.address
-  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`
-  : "";
-
-// Generate internal URLs
-const getInternalUrl = (ref: any) => {
-  if (!ref?.slug) return "";
-
-  if (ref._type === "post") {
-    return `/blog/${ref.slug}`;
-  }
-
-  if (ref._type === "product") {
-    return `/product/${ref.slug}`;
-  }
-
-  return ref.slug === "home" ? "/" : `/${ref.slug}`;
-};
-
-// Generate navigation URLs
-const getLinkUrl = (link: any) => {
-  if (!link) return "";
-
-  if (link.linkType === "external") {
-    return link.externalUrl || "";
-  }
-
-  return getInternalUrl(link.internalLink);
-};
+// Convert existing social links into the reusable Sanity linkObject format.
+const getSocialLink = (link: any) => ({
+  label: link.label,
+  linkType: "external" as const,
+  externalUrl: link.url?.trim() || "#",
+  openInNewTab: Boolean(link.url?.trim()),
+});
+const sortedColumns = [
+  ...columns.filter((column: any) => column.menuType !== "social"),
+  ...columns.filter((column: any) => column.menuType === "social"),
+];
 ---
-
 <footer class="text-white">
-
   <div class="container py-12 md:py-16">
-
     <div class="flex flex-col gap-12 lg:flex-row lg:items-start">
 
       <!-- Brand and Contact -->
       <div class="lg:w-72 lg:shrink-0">
-
         {logo && (
           <a
             href="/"
@@ -74,8 +55,7 @@ const getLinkUrl = (link: any) => {
         )}
 
         {(emails.length > 0 || phones.length > 0 || settings?.address) && (
-          <ul class="mt-6 space-y-3 text-sm text-white/60">
-
+          <ul class="mt-6 space-y-3 sm:text-sm lg:text-[15px] text-white/60">
             {emails.filter(Boolean).map((email: string) => (
               <li>
                 <a
@@ -89,14 +69,7 @@ const getLinkUrl = (link: any) => {
 
             {settings?.address && (
               <li>
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="block max-w-[34ch] transition-colors hover:text-accent"
-                >
-                  {settings.address}
-                </a>
+                {settings.address}
               </li>
             )}
 
@@ -110,18 +83,14 @@ const getLinkUrl = (link: any) => {
                 </a>
               </li>
             ))}
-
           </ul>
         )}
-
       </div>
 
       <!-- Footer Navigation -->
       {columns.length > 0 && (
         <div class="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:ml-auto lg:flex lg:gap-x-16">
-
-          {columns.map((column: any) => {
-
+          {sortedColumns.map((column: any) => {
             const isSocialMenu = column.menuType === "social";
 
             const links = isSocialMenu
@@ -135,95 +104,63 @@ const getLinkUrl = (link: any) => {
                 aria-label={column.title}
                 class="lg:w-40"
               >
-
-                <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+                <h2 class="text-xs uppercase tracking-[0.18em] text-white/40">
                   {column.title}
                 </h2>
 
                 <ul class="mt-6 space-y-2 text-sm">
-
-                  
                   {links.map((link: any) => {
-                    const href = isSocialMenu
-                      ? link.url
-                      : getLinkUrl(link);
+                      const sanityLink = isSocialMenu
+                        ? getSocialLink(link)
+                        : link.link;
 
-                    const external = isSocialMenu ||
-                      link.linkType === "external";
+                      if (!sanityLink?.label) return null;
 
-                    return (
-                      <li>
-                        {href ? (
-                          <a
-                            href={href}
-                            target={external ? "_blank" : undefined}
-                            rel={external ? "noopener noreferrer" : undefined}
+                      return (
+                        <li>
+                          <SanityLink
+                            link={sanityLink}
                             class="inline-block transition-colors hover:text-white/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                           >
-                            {link.label}
-                          </a>
-                        ) : (
-                          <span class="inline-block text-white/60">
-                            {link.label}
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-
-
+                            {sanityLink.label}
+                          </SanityLink>
+                        </li>
+                      );
+                    })}
                 </ul>
-
               </nav>
             );
-
           })}
-
         </div>
       )}
-
     </div>
-
   </div>
 
   <!-- Copyright and Legal Links -->
   {(settings?.copyrightText || legalLinks.length > 0) && (
     <div class="border-t border-white/10">
-
       <div class="container flex flex-col gap-4 py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
-
         {settings?.copyrightText && (
           <p>{settings.copyrightText}</p>
         )}
 
         {legalLinks.length > 0 && (
           <ul class="flex flex-wrap items-center gap-x-6 gap-y-3">
-
-            {legalLinks.map((link: any) => {
-
-              const href = getInternalUrl(link.internalLink);
-
-              if (!href) return null;
-
-              return (
+            {legalLinks.map((item: any) => (
+              item.link?.label && (
                 <li>
-                  <a
-                    href={href}
-                    class="transition-colors hover:text-accent"
+                  <SanityLink
+                    link={item.link}
+                    class="transition-colors hover:text-white/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                   >
-                    {link.label}
-                  </a>
+                    {item.link.label}
+                  </SanityLink>
                 </li>
-              );
-
-            })}
-
+              )
+            ))}
           </ul>
         )}
-
       </div>
-
     </div>
   )}
-
 </footer>

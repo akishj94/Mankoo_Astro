@@ -38,11 +38,22 @@ export const homepageQuery = `*[
       },
 
       primaryCta {
-        "label": link.label,
-        "linkType": link.linkType,
-        "href": link.internalLink->slug.current,
-        "url": link.externalUrl,
-        "openInNewTab": link.openInNewTab
+        // LINK RESOLVER: return the linkObject shape that getLinkUrl() in lib/links.ts expects
+        "link": link {
+          label,
+          linkType,
+          externalUrl,
+          openInNewTab,
+          "internalLink": internalLink->{
+            _type,
+            "slug": slug.current,
+            isHomepage
+          }
+        }
+        // PREVIOUS (flat shape, not resolver compatible):
+        // "label": link.label, "linkType": link.linkType,
+        // "href": link.internalLink->slug.current,
+        // "url": link.externalUrl, "openInNewTab": link.openInNewTab
       }
     },
     _type == "featureHighlightsSection" => {
@@ -127,11 +138,22 @@ export const homepageQuery = `*[
           value
         },
         cta {
-          "label": link.label,
-          "linkType": link.linkType,
-          "href": link.internalLink->slug.current,
-          "url": link.externalUrl,
-          "openInNewTab": link.openInNewTab
+          // LINK RESOLVER: return the linkObject shape that getLinkUrl() in lib/links.ts expects
+          "link": link {
+            label,
+            linkType,
+            externalUrl,
+            openInNewTab,
+            "internalLink": internalLink->{
+              _type,
+              "slug": slug.current,
+              isHomepage
+            }
+          }
+          // PREVIOUS (flat shape, not resolver compatible):
+          // "label": link.label, "linkType": link.linkType,
+          // "href": link.internalLink->slug.current,
+          // "url": link.externalUrl, "openInNewTab": link.openInNewTab
         }
       },
     _type == "imageTransitionSection" => {
@@ -177,11 +199,22 @@ export const homepageQuery = `*[
       statistic,
       statisticLabel,
       link {
-        "label": link.label,
-        "linkType": link.linkType,
-        "href": link.internalLink->slug.current,
-        "url": link.externalUrl,
-        "openInNewTab": link.openInNewTab
+        // LINK RESOLVER: return the linkObject shape that getLinkUrl() in lib/links.ts expects
+        "link": link {
+          label,
+          linkType,
+          externalUrl,
+          openInNewTab,
+          "internalLink": internalLink->{
+            _type,
+            "slug": slug.current,
+            isHomepage
+          }
+        }
+        // PREVIOUS (flat shape, not resolver compatible):
+        // "label": link.label, "linkType": link.linkType,
+        // "href": link.internalLink->slug.current,
+        // "url": link.externalUrl, "openInNewTab": link.openInNewTab
       },
       smallImage {
         alt,
@@ -232,18 +265,111 @@ export const aboutpageQuery = `*[
   sections[] {
     _type,
     _key,
-
+    _type == "teamSection" => {
+      _key,
+      _type,
+      eyebrow,
+      heading,
+      "members": members[] {
+        _key,
+        name,
+        role,
+        linkedinUrl,
+        "image": image {
+          alt,
+          "url": asset->url,
+          "dimensions": asset->metadata.dimensions,
+          "lqip": asset->metadata.lqip
+        }
+      },
+      "cta": cta {
+        label,
+        linkType,
+        externalUrl,
+        openInNewTab,
+        "internalLink": internalLink->{
+          _type,
+          title,
+          name,
+          "slug": slug.current,
+          isHomepage
+        }
+      }
+    },
+    _type == "pageIntro" => {
+      _key,
+      _type,
+      eyebrow,
+      heading,
+      description,
+      introMedia{
+        image {
+            alt,
+            "asset": asset-> {
+              _id,
+              url,
+              metadata {
+                dimensions,
+                lqip
+              }
+            }
+          },
+          video {
+            "asset": asset-> {
+              _id,
+              url,
+              originalFilename,
+              mimeType
+            }
+          }
+      }
+    },
+    _type == "mediaBlock" => {
+        _key,
+        _type,
+        video {
+          "asset": asset-> {
+            _id,
+            url,
+            originalFilename,
+            mimeType
+          }
+        },
+        image {
+          alt,
+          "asset": asset-> {
+            _id,
+            url,
+            metadata {
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
+              lqip
+            }
+          }
+        },
+        imageAlt
+      },
     _type == "splitGridSection" => {
       introText,
       highlightText,
       statistic,
       statisticLabel,
       link {
-        "label": link.label,
-        "linkType": link.linkType,
-        "href": link.internalLink->slug.current,
-        "url": link.externalUrl,
-        "openInNewTab": link.openInNewTab
+        // LINK RESOLVER: return the linkObject shape that getLinkUrl() in lib/links.ts expects
+        "link": link {
+          label,
+          linkType,
+          externalUrl,
+          openInNewTab,
+          "internalLink": internalLink->{
+            _type,
+            "slug": slug.current,
+            isHomepage
+          }
+        }
       },
       smallImage {
         alt,
@@ -275,9 +401,13 @@ export const aboutpageQuery = `*[
           link {
             label,
             linkType,
-            "href": internalLink->slug.current,
             externalUrl,
-            openInNewTab
+            openInNewTab,
+            "internalLink": internalLink->{
+              _type,
+              "slug": slug.current,
+              isHomepage
+            }
           }
         },
         backgroundImage {
@@ -321,6 +451,54 @@ export const aboutpageQuery = `*[
 }`;
 
 
+export const contactpageQuery = `*[
+  _type == "page" &&
+  slug.current in ["contact", "contact-us"]
+][0] {
+  title,
+  "slug": slug.current,
+
+  sections[] {
+    _type,
+    _key,
+
+    _type == "pageIntro" => {
+      _key,
+      _type,
+      eyebrow,
+      heading,
+      description,
+      introMedia {
+        image {
+          alt,
+          "asset": asset-> {
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          }
+        }
+      }
+    }
+  },
+
+  seo {
+    metaTitle,
+    metaDescription,
+    metaKeywords,
+    ogTitle,
+    ogDescription,
+    ogImage {
+      alt,
+      "url": asset->url
+    },
+    canonicalUrl,
+    noIndex
+  }
+}`;
+
 /* --------------------------------------------------
    Site settings query
    Default SEO fallback
@@ -336,25 +514,29 @@ export const siteSettingsQuery = `*[
   logoAlt,
 
   "footerLogoUrl": footerLogo.asset->url,
-  "footerLogoAlt": FooterlogoAlt,
+  "footerLogoAlt": footerLogoAlt,
 
   whatsAppLink,
 
   footerNavigation[] {
+  _key,
+  title,
+  menuType,
+  "links": links[] {
     _key,
-    title,
-    menuType,
-    links[] {
-      _key,
+    "link": link {
       label,
       linkType,
       externalUrl,
+      openInNewTab,
       "internalLink": internalLink->{
         _type,
-        "slug": slug.current
+        "slug": slug.current,
+        isHomepage
       }
     }
-  },
+  }
+},
 
   socialLinks[] {
     _key,
@@ -365,15 +547,21 @@ export const siteSettingsQuery = `*[
   email,
   phone,
   address,
-
+  map,
   copyrightText,
 
-  legalLinks[] {
+  "legalLinks": legalLinks[] {
     _key,
-    label,
-    "internalLink": internalLink->{
-      _type,
-      "slug": slug.current
+    "link": link {
+      label,
+      linkType,
+      externalUrl,
+      openInNewTab,
+      "internalLink": internalLink->{
+        _type,
+        "slug": slug.current,
+        isHomepage
+      }
     }
   }
 }`;
@@ -457,25 +645,48 @@ export const productBySlugQuery = `*[
     "lqip": asset->metadata.lqip
   },
 
-  // Block 1: Hero
   
-  hero {
-    eyebrow,
-    heading,
-    tagline,
-    subLine,
-    "backgroundVideo": backgroundVideo.asset->url,
-    primaryCtaLabel,
-    primaryCtaLinkType,
-    primaryCtaInternalLink->{
-      _type,
-      name,
-      title,
-      slug
+  // Block 1: Hero
+    hero {
+      eyebrow,
+      heading,
+      tagline,
+      subLine,
+      backgroundVideo {
+        image {
+          alt,
+          "asset": asset-> {
+            _id,
+            url,
+            metadata {
+              dimensions,
+              lqip
+            }
+          }
+        },
+        video {
+          "asset": asset-> {
+            _id,
+            url,
+            originalFilename,
+            mimeType
+          }
+        }
+      },
+      "primaryCta": primaryCta {
+        label,
+        linkType,
+        externalUrl,
+        openInNewTab,
+        "internalLink": internalLink->{
+          _type,
+          name,
+          title,
+          "slug": slug.current,
+          isHomepage
+        }
+      }
     },
-    primaryCtaExternalUrl,
-    brochureCtaLabel
-  },
 
   "brochures": brochures[] {
     _key,
@@ -611,14 +822,30 @@ export const productBySlugQuery = `*[
   // Block 10: Final CTA band
   finalCta {
     heading,
-    copy,
-    buttonLabel,
-    buttonUrl,
+    description,
+    cta {
+      link {
+        label,
+        linkType,
+        externalUrl,
+        openInNewTab,
+        "internalLink": internalLink->{
+          _type,
+          "slug": slug.current,
+          isHomepage
+        }
+      }
+    },
     backgroundImage {
       alt,
-      "url": asset->url,
-      "dimensions": asset->metadata.dimensions,
-      "lqip": asset->metadata.lqip
+      "asset": asset->{
+        _id,
+        url,
+        metadata {
+          dimensions,
+          lqip
+        }
+      }
     }
   },
 

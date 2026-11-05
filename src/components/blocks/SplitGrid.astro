@@ -1,30 +1,24 @@
 ---
+import SanityLink from "../SanityLinks.astro";
+
 const { section } = Astro.props;
 
 const smallImageUrl = section?.smallImage?.asset?.url;
 const largeImageUrl = section?.largeImage?.asset?.url;
 
-const introText =
-  section?.introText ?? 'N/A';
+const introText = section?.introText ?? "N/A";
+const highlightText = section?.highlightText ?? "N/A";
 
-const highlightText =
-  section?.highlightText ?? 'N/A';
+const statistic = section?.statistic ?? "N/A";
+const statisticLabel = section?.statisticLabel ?? "N/A";
 
-const statistic = section?.statistic ?? 'N/A';
-const statisticLabel =
-  section?.statisticLabel ?? 'N/A';
-  
-const link = section?.link;
-const isExternal = link?.linkType === "external";
+// section.link is a CTA object containing the reusable linkObject
+const link = section?.link?.link;
+const ctaLabel = link?.label;
 
-const internalHref = link?.href
-  ? `/${link.href.replace(/^\/+/, "")}`
-  : undefined;
-
-const ctaHref = isExternal ? link?.url : internalHref;
-const openInNewTab = Boolean(link?.openInNewTab);
-const ctaLabel = link?.label || "Discover";
+const hasCta = Boolean(link && ctaLabel?.trim());
 ---
+
 <section
   data-split-grid
   class="bg-[image:var(--dark-gradient-bottom)] py-24 text-white light:text-ink"
@@ -32,10 +26,10 @@ const ctaLabel = link?.label || "Discover";
   <div class="container grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
     <div class="grid grid-cols-[61fr_39fr]" data-reveal>
       {smallImageUrl && (
-        <div class="col-start-2 row-start-1 aspect-[5/6] overflow-hidden bg-neutral-900">
+        <div class="col-start-2 row-start-1 aspect-[5/6] overflow-hidden">
           <img
             src={smallImageUrl}
-            alt={section.smallImage?.alt ?? ''}
+            alt={section.smallImage?.alt ?? ""}
             width="640"
             height="500"
             sizes="(min-width: 1024px) 20vw, 100vw"
@@ -47,7 +41,7 @@ const ctaLabel = link?.label || "Discover";
       )}
 
       {largeImageUrl && (
-        <div class="relative col-start-1 row-start-2 aspect-[5/6] overflow-hidden bg-neutral-900">
+        <div class="relative col-start-1 row-start-2 aspect-[5/6] overflow-hidden">
           <img
             src={largeImageUrl}
             alt={section.largeImage?.alt ?? ""}
@@ -56,7 +50,7 @@ const ctaLabel = link?.label || "Discover";
             sizes="(min-width: 1024px) 30vw, 100vw"
             loading="lazy"
             decoding="async"
-            class="absolute inset-0 block !size-full object-cover  object-center"
+            class="absolute inset-0 block !size-full object-cover object-center"
           />
         </div>
       )}
@@ -67,7 +61,7 @@ const ctaLabel = link?.label || "Discover";
         {introText}
         {highlightText && (
           <span class="text-[#7C7C7C]">
-            {' '}{highlightText}
+            {" "}{highlightText}
           </span>
         )}
       </p>
@@ -80,14 +74,13 @@ const ctaLabel = link?.label || "Discover";
           </p>
         </div>
 
-       {ctaHref && (
-          <a
-            href={ctaHref}
-            target={openInNewTab ? "_blank" : undefined}
-            rel={openInNewTab ? "noopener noreferrer" : undefined}
+        {hasCta && (
+          <SanityLink
+            link={link}
             class="inline-flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] bg-[rgba(246,246,246,0.2)] px-4 py-4 text-[15px] leading-[1.2] text-white backdrop-blur-[5px] transition-all duration-250 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[16px] md:hover:bg-[rgba(246,246,246,0.35)] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
           >
             <span class="md:max-w-[10ch]">{ctaLabel}</span>
+
             <svg
               width="15"
               height="24"
@@ -98,7 +91,7 @@ const ctaLabel = link?.label || "Discover";
             >
               <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
             </svg>
-          </a>
+          </SanityLink>
         )}
       </div>
     </div>

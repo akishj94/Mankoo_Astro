@@ -1,4 +1,6 @@
 ---
+import SanityLink from "../SanityLinks.astro";
+
 const {
   eyebrow = "FEATURED PRODUCT",
   heading,
@@ -17,17 +19,22 @@ const validSpecifications = Array.isArray(specifications)
     )
   : [];
 
-const ctaHref =
-  cta?.linkType === "external"
-    ? cta?.url
-    : cta?.linkType === "internal" && cta?.href
-      ? `/${cta.href.replace(/^\/+|\/+$/g, "")}/`
-      : null;
+// LINK RESOLVER: cta is now { link: linkObject }
+const ctaLink = cta?.link;
+const validCta = Boolean(ctaLink?.label);
 
-const validCta = Boolean(cta?.label && ctaHref);
-
-const ctaTarget = cta?.openInNewTab ? "_blank" : undefined;
-const ctaRel = cta?.openInNewTab ? "noopener noreferrer" : undefined;
+const ctaTarget = ctaLink?.openInNewTab ? "_blank" : undefined;
+const ctaRel = ctaLink?.openInNewTab ? "noopener noreferrer" : undefined;
+// PREVIOUS:
+// const ctaHref =
+//   cta?.linkType === "external"
+//     ? cta?.url
+//     : cta?.linkType === "internal" && cta?.href
+//       ? `/${cta.href.replace(/^\/+|\/+$/g, "")}/`
+//       : null;
+// const validCta = Boolean(cta?.label && ctaHref);
+// const ctaTarget = cta?.openInNewTab ? "_blank" : undefined;
+// const ctaRel = cta?.openInNewTab ? "noopener noreferrer" : undefined;
 ---
 {heading && (
   <section data-featured class="text-white">
@@ -110,14 +117,12 @@ const ctaRel = cta?.openInNewTab ? "noopener noreferrer" : undefined;
             )}
 
             {validCta && (
-              <a
-                href={ctaHref}
-                target={ctaTarget}
-                rel={ctaRel}
+              <SanityLink
+                link={ctaLink}
                 class="inline-flex aspect-[6/3] max-h-[140px] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] bg-[rgba(246,246,246,0.2)] px-4 py-4 text-[15px] leading-[1.2] text-white backdrop-blur-[5px] transition-all duration-250 hover:bg-[rgba(246,246,246,0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:hover:bg-[rgba(246,246,246,0.35)] lg:text-[16px] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
               >
                 <span class="inline-flex max-w-[140px] lg:max-w-[160px]">
-                  {cta.label}
+                  {ctaLink.label}
                 </span>
 
                 <svg
@@ -130,7 +135,7 @@ const ctaRel = cta?.openInNewTab ? "noopener noreferrer" : undefined;
                 >
                   <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
                 </svg>
-              </a>
+              </SanityLink>
             )}
           </div>
         </div>

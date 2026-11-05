@@ -18,6 +18,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.2",
     "gsap": "^3.15.0",
+    "intl-tel-input": "^29.5.10",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-is": "^19.3.1",

@@ -1,5 +1,5 @@
 
-import { defineField, defineType } from "sanity";
+import { defineField, defineType, defineArrayMember } from "sanity";
 
 export const cta = defineType({
   name: "cta",
@@ -145,7 +145,7 @@ export const heroSection = defineType({
       name: "heading",
       title: "Heading",
       type: "string",
-    }),    
+    }),       
     defineField({
       name: "heroMedia",
       title: "Background Image/Video",
@@ -156,6 +156,39 @@ export const heroSection = defineType({
       title: "Call To Action",
       type: "cta",
     }),   
+  ],
+  preview: {
+    select: { title: "heading", media: "image" },
+    prepare({ title, media }) {
+      return { title: title || "Hero Section", media };
+    },
+  },
+});
+export const pageIntro = defineType({
+  name: "pageIntro",
+  title: "Page Intro",
+  type: "object",
+  fields: [
+    defineField({
+      name: "eyebrow",
+      title: "SubTitle/ Eyebrow Text",
+      type: "string",
+    }),
+    defineField({
+      name: "heading",
+      title: "Heading",
+      type: "string",
+    }),    
+    defineField({
+      name: "description",
+      title: "Content",
+      type: "text",
+    }),    
+    defineField({
+      name: "introMedia",
+      title: "Media",
+      type: "mediaBlock",
+    }), 
   ],
   preview: {
     select: { title: "heading", media: "image" },
@@ -340,30 +373,30 @@ export const productGridSection = defineType({
   ],
 });
 
-export const gallerySection = defineType({
-  name: "gallerySection",
-  title: "Image Gallery",
-  type: "object",
-  fields: [
-    defineField({ name: "heading", title: "Heading", type: "string" }),
-    defineField({
-      name: "images",
-      title: "Images",
-      type: "array",
-      of: [
-        {
-          type: "image",
-          options: { hotspot: true },
-          fields: [
-            defineField({ name: "alt", title: "Alt Text", type: "string" }),
-            defineField({ name: "caption", title: "Caption", type: "string" }),
-          ],
-        },
-      ],
-      validation: (Rule) => Rule.min(1),
-    }),
-  ],
-});
+// export const gallerySection = defineType({
+//   name: "gallerySection",
+//   title: "Image Gallery",
+//   type: "object",
+//   fields: [
+//     defineField({ name: "heading", title: "Heading", type: "string" }),
+//     defineField({
+//       name: "images",
+//       title: "Images",
+//       type: "array",
+//       of: [
+//         {
+//           type: "image",
+//           options: { hotspot: true },
+//           fields: [
+//             defineField({ name: "alt", title: "Alt Text", type: "string" }),
+//             defineField({ name: "caption", title: "Caption", type: "string" }),
+//           ],
+//         },
+//       ],
+//       validation: (Rule) => Rule.min(1),
+//     }),
+//   ],
+// });
 
 export const ctaBannerSection = defineType({
   name: "ctaBannerSection",
@@ -852,17 +885,95 @@ export const timelineSection = defineType({
     },
   },
 });
+export const teamSection = defineType({
+  name: "teamSection",
+  title: "Team Section",
+  type: "object",
+  fields: [
+    defineField({
+      name: "eyebrow",
+      title: "Eyebrow",
+      type: "string",
+      initialValue: "Meet the leadership team",
+    }),
+    defineField({
+      name: "heading",
+      title: "Heading",
+      type: "string",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "members",
+      title: "Team Members",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "teamMember",
+          title: "Team Member",
+          fields: [
+            defineField({
+              name: "name",
+              title: "Name",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "role",
+              title: "Position / Role",
+              type: "string",
+            }),
+            defineField({
+              name: "image",
+              title: "Portrait",
+              type: "image",
+              options: { hotspot: true },
+              fields: [
+                defineField({
+                  name: "alt",
+                  title: "Alt Text",
+                  type: "string",
+                }),
+              ],
+            }),
+            defineField({
+              name: "linkedinUrl",
+              title: "LinkedIn URL",
+              type: "url",
+              validation: (Rule) =>
+                Rule.uri({
+                  scheme: ["http", "https"],
+                }),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "name",
+              subtitle: "role",
+              media: "image",
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "cta",
+      title: "Call to Action",
+      type: "linkObject",
+    }),
+  ],
+});
 export const pageSections = defineType({
   name: "pageSections",
   title: "Page Section",
   type: "array",
   of: [
     { type: "heroSection" },
+    { type: "pageIntro" },
     { type: "richTextSection" },
     { type: "mediaBlock" },
     { type: "featureGridSection" },
     { type: "productGridSection" },
-    { type: "gallerySection" },
     { type: "ctaBannerSection" },
     { type: "featureHighlightsSection" },
     { type: "splitGridSection" },
@@ -872,5 +983,6 @@ export const pageSections = defineType({
     { type: "imageTransitionSection" },
     { type: "productSliderSection" },
     { type: "timelineSection" },
+    { type: "teamSection" },
   ],
 });

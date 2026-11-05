@@ -1,0 +1,159 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { sanityClient } from 'sanity:client';
+import { contactpageQuery } from "../lib/queries";
+import ContactForm from "../components/form/ContactForm.astro";
+import MediaBlock from "../components/blocks/MediaBlock.astro";
+import { siteSettingsQuery } from "../lib/queries";
+
+const page = await sanityClient.fetch(contactpageQuery);
+const pageIntro = page?.sections?.find(
+  (section) => section._type === "pageIntro"
+);
+
+const paragraphs = pageIntro.description
+  .split(/\n{2,}/)
+  .map((block) => block.trim())
+  .filter(Boolean);
+
+// SEO
+const seoTitle =
+  page?.seo?.metaTitle || page?.title || "Home | Mankoo";
+const seoDescription =
+  page?.seo?.metaDescription ||
+  page?.title ||
+  "";
+const seoKeywords = page?.seo?.metaKeywords || "";
+const canonicalUrl = page?.seo?.canonicalUrl || "/";
+
+const settings = await sanityClient.fetch(siteSettingsQuery);
+const emails = settings?.email ?? [];
+const phones = settings?.phone ?? [];
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDescription}
+  canonical={page?.seo?.canonicalUrl || undefined}
+  noindex={page?.seo?.noIndex ?? undefined}
+  ogTitle={page?.seo?.ogTitle ?? undefined}
+  ogDescription={page?.seo?.ogDescription ?? undefined}
+  ogImage={
+    page?.seo?.ogImage?.url
+      ? { url: page.seo.ogImage.url, alt: page.seo.ogImage.alt }
+      : undefined
+  }
+  metaKeywords={seoKeywords}
+>
+<section data-page-intro class="text-white light:text-ink">
+  <div class="container pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem)*1.5)]">
+    <div class="min-w-0 mb-12 lg:mb-16">   
+        {pageIntro?.heading && (
+          <h2
+            class:list={[
+              'leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]']}
+          >
+            {pageIntro?.heading ?? ''}
+          </h2>
+        )}        
+      </div>
+
+      <div class="grid grid-cols-1 gap-y-10 lg:grid-cols-[1.5fr_2fr] lg:items-start lg:gap-[2rem] md:justify-between lg:justify-normal"> 
+        <div>
+            <div class="mb-12">
+                {paragraphs.length > 0 && (
+                    <div class="min-w-0 mb-6 xl:max-w-[60ch]">
+                    {paragraphs.map((paragraph, index) => (
+                        <h3
+                        class:list={[
+                            'text-pretty text-[20px] md:text-[22px] xl:text-2xl leading-[1.45] light:text-ink/60',
+                            index > 0 && 'mt-4',
+                        ]}
+                        >
+                        {paragraph}
+                        </h3>
+                    ))}
+                    </div>
+                )}
+                {(emails.length > 0 || phones.length > 0 || settings?.address || settings?.map) && (
+                    <div class="contact-details flex flex-col gap-4 md:gap-4 xl:gap-y-10 text-sm md:text-base">
+
+                        {emails.filter(Boolean).length > 0 && (
+                            <div class="flex flex-col gap-2">
+                                <span class="block title">Email</span>
+
+                                {emails.filter(Boolean).map((email: string) => (
+                                    <div key={email}>
+                                        <a
+                                            href={`mailto:${email}`}
+                                            class="transition-colors hover:text-accent !text-white/60"
+                                        >
+                                            {email}
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {phones.filter(Boolean).length > 0 && (
+                            <div class="flex flex-col gap-2">
+                                <span class="block title">Phone</span>
+
+                                {phones.filter(Boolean).map((phone: string) => (
+                                    <div key={phone}>
+                                        <a
+                                            href={`tel:${phone.replace(/[^\d+]/g, "")}`}
+                                            class="transition-colors !hover:text-accent !text-white/60"
+                                        >
+                                            {phone}
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {settings?.address && (
+                            <div class="flex flex-col gap-2 lg:max-w-[50%]">
+                                <span class="block title">Address</span>
+                                <div class="!text-white/60">{settings.address}</div>                                
+                            </div>
+                        )}
+
+                        {settings?.map && (                            
+                            <a
+                                href={settings.map}
+                                class="inline-flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] bg-[rgba(246,246,246,0.2)] px-4 py-4 text-[15px] leading-[1.2] text-white backdrop-blur-[5px] transition-all duration-250 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[16px] md:hover:bg-[rgba(246,246,246,0.35)] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85 mt-10 lg:mt-16"
+                                target="_blank"
+                            >
+                                <span class="md:max-w-[10ch]">Locate Us</span>
+
+                                <svg
+                                width="15"
+                                height="24"
+                                class="h-4 w-[15px] shrink-0"
+                                viewBox="0 -960 960 960"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                >
+                                <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+                                </svg>
+                            </a>
+                        )}
+                    </div>
+                )}                
+            </div>
+        </div>       
+        <div class="order-1">
+            
+            <ContactForm/>        
+        </div>        
+    </div>     
+  </div>
+</section>
+{pageIntro?.introMedia ? (
+    <div class="mt-16 lg:mt-24"></div>
+    <MediaBlock media={pageIntro.introMedia} aspectRatio="21/9"/>    
+  ) :   
+    <div class="mt-16 lg:mt-24 border-b border-white/10"></div>
+  }
+</Layout>

@@ -445,8 +445,8 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
             );
 
             form.reset();
-
-            iti.setCountry("in");
+            iti.setNumber("");
+            iti.setSelectedCountry("in");
             phoneInput.value = "";
 
             fields.forEach(clearFieldError);

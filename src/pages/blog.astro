@@ -65,7 +65,7 @@ const eyebrow = 'Blog';
     class="container pb-[clamp(2rem,3vw,4rem)] pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem))]"
   >
     <div
-      class="grid grid-cols-1 gap-y-10 lg:grid-cols-[minmax(0,42%)_minmax(0,min(26%,_30rem))] lg:items-end lg:gap-[clamp(4rem,24vw,34rem)] md:justify-between lg:justify-normal"
+      class="grid grid-cols-1 gap-y-5 lg:grid-cols-[minmax(0,42%)_minmax(0,min(26%,_30rem))] lg:items-end lg:gap-[clamp(4rem,24vw,34rem)] md:justify-between lg:justify-normal"
     >
       <div class="min-w-0">
         {eyebrow && (
@@ -78,7 +78,7 @@ const eyebrow = 'Blog';
           <h1
             class:list={[
               'max-w-[11em] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]',
-              eyebrow && 'mt-6',
+              eyebrow && 'mt-2 lg:mt-4',
             ]}
           >
             {listingTitle}
@@ -110,7 +110,7 @@ const eyebrow = 'Blog';
     ) : (
       <>
         <div
-          class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3 lg:grid-cols-4"
+          class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         >
           {pagePosts.map((post) => (
             <article class="group" key={post._id}>
@@ -181,4 +181,5 @@ const eyebrow = 'Blog';
       </>
     )}
   </section>
+  <div class="border-b border-white/10 " data-astro-cid-lcdefpme=""></div>
 </Layout>

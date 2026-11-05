@@ -83,7 +83,7 @@ const headingId = `timeline-heading-${safeSectionKey}`;
         {heading && (
           <h2
             id={headingId}
-            class="mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]"
+            class="mt-2 lg:mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]"
             data-reveal
           >
             {heading}
@@ -99,10 +99,10 @@ const headingId = `timeline-heading-${safeSectionKey}`;
           aria-label="Company history milestones"
           aria-roledescription="carousel"
         >
-          <ul class="swiper-wrapper items-stretch">
+          <div class="swiper-wrapper items-stretch gap-x-5 md:gap-x-8 lg:gap-x-10">
             {slides.map((item, index) => (
-              <li
-                class="swiper-slide h-auto! px-3 w-full! sm:w-1/2! md:w-1/3! lg:w-1/4!"
+              <div
+                class="swiper-slide h-auto! w-full! sm:w-1/2! md:w-1/3! lg:w-1/4!"
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`Milestone ${index + 1} of ${slides.length}: ${item.title}`}
@@ -125,9 +125,9 @@ const headingId = `timeline-heading-${safeSectionKey}`;
                     {item.content}
                   </p>
                 </article>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
         <div
@@ -158,16 +158,16 @@ const headingId = `timeline-heading-${safeSectionKey}`;
               return (
                 <span
                   class:list={[
-                    "block shrink-0 rounded-full",
+                    "block shrink-0",
                     isAccent
                       ? "bg-accent"
                       : "bg-white/20 light:bg-ink/15",
                     isLong
-                      ? "h-[28px] w-[3px]"
+                      ? "h-[28px] w-[2px]"
                       : isMedium
                         ? "h-[18px]"
                         : "h-[10px]",
-                    isLong || isMedium ? "" : "w-[2px]",
+                    isLong || isMedium ? "" : "w-[1px]",
                     "opacity-55",
                   ]}
                 />

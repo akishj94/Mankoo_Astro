@@ -1,3 +1,4 @@
+
 ---
 const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
 ---
@@ -8,6 +9,7 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
   class="contact-form w-full"
   novalidate
 >
+  <!-- Web3Forms configuration -->
   <input type="hidden" name="access_key" value={accessKey} />
   <input
     type="hidden"
@@ -22,7 +24,7 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
 
   <!-- Honeypot -->
   <input
-    type="text"
+    type="checkbox"
     name="botcheck"
     class="hidden"
     tabindex="-1"
@@ -50,10 +52,8 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
         class="contact-input placeholder:text-white/20 placeholder:tracking-[0.5px]"
       />
 
-      <p
-        class="field-error mt-2 hidden text-sm leading-5 text-red-400"
-        data-error-for="contact-name"
-      >
+      <p class="field-error mt-2 hidden text-sm leading-5 text-red-400"
+        data-error-for="contact-name">
         Please enter your full name.
       </p>
     </div>
@@ -75,15 +75,13 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
         class="contact-input placeholder:text-white/20 placeholder:tracking-[0.5px]"
       />
 
-      <p
-        class="field-error mt-2 hidden text-sm leading-5 text-red-400"
-        data-error-for="contact-email"
-      >
+      <p class="field-error mt-2 hidden text-sm leading-5 text-red-400"
+        data-error-for="contact-email">
         Please enter a valid email address.
       </p>
     </div>
 
-    <!-- International Phone -->
+    <!-- Phone -->
     <div>
       <label for="contact-phone" class="mb-2 block text-normal">
         Phone Number <span aria-hidden="true" class="text-accent">*</span>
@@ -99,10 +97,8 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
         class="contact-input placeholder:text-white/20 placeholder:tracking-[0.5px]"
       />
 
-      <p
-        class="field-error mt-2 hidden text-sm leading-5 text-red-400"
-        data-error-for="contact-phone"
-      >
+      <p class="field-error mt-2 hidden text-sm leading-5 text-red-400"
+        data-error-for="contact-phone">
         Please enter a valid international phone number.
       </p>
     </div>
@@ -119,19 +115,15 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
         required
         class="contact-input cursor-pointer color-scheme-dark"
       >
-        <option value="" disabled selected>
-          Select an inquiry type
-        </option>
+        <option value="" disabled selected>Select an inquiry type</option>
         <option value="Buying New Machine">Buying New Machine</option>
         <option value="General Query">General Query</option>
         <option value="Customer Support">Customer Support</option>
         <option value="Contract">Contract</option>
       </select>
 
-      <p
-        class="field-error mt-2 hidden text-sm leading-5 text-red-400"
-        data-error-for="contact-inquiry"
-      >
+      <p class="field-error mt-2 hidden text-sm leading-5 text-red-400"
+        data-error-for="contact-inquiry">
         Please select an inquiry type.
       </p>
     </div>
@@ -153,19 +145,30 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
         class="contact-input min-h-36 resize-y placeholder:text-white/20 placeholder:tracking-[0.5px]"
       ></textarea>
 
-      <p
-        class="field-error mt-2 hidden text-sm leading-5 text-red-400"
-        data-error-for="contact-message"
-      >
+      <p class="field-error mt-2 hidden text-sm leading-5 text-red-400"
+        data-error-for="contact-message">
         Please enter a message of at least 10 characters.
       </p>
     </div>
   </div>
 
-  <!-- Submit -->
-  <div
-    class="mt-12 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between lg:mt-16"
-  >
+  <!-- hCaptcha and Submit -->
+  <div class="mt-12 flex flex-col items-start gap-5 lg:mt-16">
+
+    <div
+      class="h-captcha"
+      data-captcha="true"
+      data-theme="dark"
+    ></div>
+
+    <p
+      class="field-error hidden text-sm leading-5 text-red-400"
+      data-captcha-error
+      role="alert"
+    >
+      Please complete the CAPTCHA verification.
+    </p>
+
     <button
       type="submit"
       class="inline-flex min-w-[180px] max-w-[300px] shrink-0 cursor-pointer flex-col justify-end gap-6 rounded-[6px] bg-[#0b3bff] px-5 py-4 text-[15px] text-white transition-colors hover:bg-[#0030e0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60 lg:text-base"
@@ -183,265 +186,316 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
   ></p>
 </form>
 
+<!-- Web3Forms CAPTCHA script -->
+<script
+  is:inline
+  src="https://web3forms.com/client/script.js"
+  async
+  defer
+></script>
+
 <script>
   import intlTelInput from "intl-tel-input";
   import "intl-tel-input/styles";
 
+  type FormField =
+    | HTMLInputElement
+    | HTMLSelectElement
+    | HTMLTextAreaElement;
+
   function initialiseContactForms() {
-    document.querySelectorAll<HTMLFormElement>(".contact-form").forEach((form) => {
-      if (form.dataset.initialized === "true") return;
+    document.querySelectorAll<HTMLFormElement>(".contact-form")
+      .forEach((form) => {
+        if (form.dataset.initialized === "true") return;
 
-      const phoneInput =
-        form.querySelector<HTMLInputElement>("#contact-phone");
+        const phoneInput =
+          form.querySelector<HTMLInputElement>("#contact-phone");
 
-      const submitButton =
-        form.querySelector<HTMLButtonElement>('button[type="submit"]');
+        const submitButton =
+          form.querySelector<HTMLButtonElement>('button[type="submit"]');
 
-      const result =
-        form.querySelector<HTMLParagraphElement>("[data-contact-result]");
+        const result =
+          form.querySelector<HTMLParagraphElement>("[data-contact-result]");
 
-      const buttonLabel =
-        form.querySelector<HTMLElement>("[data-button-label]");
+        const buttonLabel =
+          form.querySelector<HTMLElement>("[data-button-label]");
 
-      if (!phoneInput || !submitButton || !result || !buttonLabel) return;
+        const captchaError =
+          form.querySelector<HTMLElement>("[data-captcha-error]");
 
-      form.dataset.initialized = "true";
+        if (!phoneInput || !submitButton || !result ||
+            !buttonLabel || !captchaError) return;
 
-      const iti = intlTelInput(phoneInput, {
-        initialCountry: "in",
-        preferredCountries: ["in", "us", "gb", "ae", "de"],
-        separateDialCode: true,
-        nationalMode: true,
-        strictMode: true,
-        loadUtils: () => import("intl-tel-input/utils"),
-      });
+        form.dataset.initialized = "true";
 
-      const fields = Array.from(
-        form.querySelectorAll<
-          HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-        >(
-          "input[required], select[required], textarea[required]"
-        )
-      );
+        const iti = intlTelInput(phoneInput, {
+          initialCountry: "in",
+          preferredCountries: ["in", "us", "gb", "ae", "de"],
+          separateDialCode: true,
+          nationalMode: true,
+          strictMode: true,
+          loadUtils: () => import("intl-tel-input/utils"),
+        });
 
-      function setFieldError(field: HTMLElement, message: string) {
-        const error = form.querySelector<HTMLElement>(
-          `[data-error-for="${field.id}"]`
-        );
+        const fields = Array.from(
+          form.querySelectorAll<FormField>(
+            "input[required], select[required], textarea[required]"
+          )
+        ).filter((field) => field.name !== "botcheck");
 
-        field.setAttribute("aria-invalid", "true");
+        let isSubmitting = false;
 
-        if (error) {
-          error.textContent = message;
-          error.classList.remove("hidden");
+        function showResult(
+          message: string,
+          type: "success" | "error"
+        ) {
+          result.textContent = message;
+          result.classList.remove("text-red-400", "text-green-400");
+          result.classList.add(
+            type === "success" ? "text-green-400" : "text-red-400"
+          );
         }
-      }
 
-      function clearFieldError(field: HTMLElement) {
-        const error = form.querySelector<HTMLElement>(
-          `[data-error-for="${field.id}"]`
-        );
-
-        field.removeAttribute("aria-invalid");
-
-        if (error) {
-          error.classList.add("hidden");
+        function clearResult() {
+          result.textContent = "";
+          result.classList.remove("text-red-400", "text-green-400");
         }
-      }
 
-      function validateField(
-        field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-      ) {
-        clearFieldError(field);
+        function setFieldError(field: HTMLElement, message: string) {
+          const error = form.querySelector<HTMLElement>(
+            `[data-error-for="${field.id}"]`
+          );
 
-        // International phone validation
-        if (field === phoneInput) {
-          if (!phoneInput.value.trim()) {
-            setFieldError(
-              phoneInput,
-              "Please enter your phone number."
-            );
+          field.setAttribute("aria-invalid", "true");
 
-            return false;
+          if (error) {
+            error.textContent = message;
+            error.classList.remove("hidden");
+          }
+        }
+
+        function clearFieldError(field: HTMLElement) {
+          const error = form.querySelector<HTMLElement>(
+            `[data-error-for="${field.id}"]`
+          );
+
+          field.removeAttribute("aria-invalid");
+          error?.classList.add("hidden");
+        }
+
+        function validateField(field: FormField): boolean {
+          clearFieldError(field);
+
+          if (field === phoneInput) {
+            if (!phoneInput.value.trim()) {
+              setFieldError(phoneInput, "Please enter your phone number.");
+              return false;
+            }
+
+            if (!iti.isValidNumber()) {
+              setFieldError(
+                phoneInput,
+                "Please enter a valid international phone number."
+              );
+              return false;
+            }
+
+            return true;
           }
 
-          if (!iti.isValidNumber()) {
-            setFieldError(
-              phoneInput,
-              "Please enter a valid international phone number."
-            );
+          if (!field.checkValidity()) {
+            let message = "Please check this field.";
 
+            if (field instanceof HTMLInputElement && field.type === "email") {
+              message = "Please enter a valid email address.";
+            } else if (field instanceof HTMLTextAreaElement) {
+              message = "Please enter a message of at least 10 characters.";
+            } else if (field instanceof HTMLSelectElement) {
+              message = "Please select an inquiry type.";
+            } else if (field instanceof HTMLInputElement && field.type === "text") {
+              message = "Please enter your full name.";
+            }
+
+            setFieldError(field, message);
             return false;
           }
 
           return true;
         }
 
-        // Standard HTML validation
-        if (!field.checkValidity()) {
-          let message = "Please check this field.";
-
-          if (
-            field instanceof HTMLInputElement &&
-            field.type === "email"
-          ) {
-            message = "Please enter a valid email address.";
-          } else if (field instanceof HTMLTextAreaElement) {
-            message = "Please enter a message of at least 10 characters.";
-          } else if (field instanceof HTMLSelectElement) {
-            message = "Please select an inquiry type.";
-          } else if (
-            field instanceof HTMLInputElement &&
-            field.type === "text"
-          ) {
-            message = "Please enter your full name.";
-          }
-
-          setFieldError(field, message);
-          return false;
+        function showCaptchaError() {
+          captchaError.classList.remove("hidden");
+          form.querySelector(".h-captcha")?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
         }
 
-        return true;
-      }
+        function clearCaptchaError() {
+          captchaError.classList.add("hidden");
+        }
 
-      // Validate fields on user interaction
-      fields.forEach((field) => {
-        field.addEventListener("input", () => {
-          validateField(field);
+        fields.forEach((field) => {
+          field.addEventListener("input", () => {
+            validateField(field);
+            clearResult();
+          });
+
+          field.addEventListener("change", () => {
+            validateField(field);
+            clearResult();
+          });
         });
 
-        field.addEventListener("change", () => {
-          validateField(field);
-        });
-      });
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
 
-      // Form submission
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+          if (isSubmitting) return;
 
-        if (submitButton.disabled) return;
+          isSubmitting = true;
+          submitButton.disabled = true;
+          buttonLabel.textContent = "Sending...";
 
-        result.textContent = "";
-        result.classList.remove("text-red-400", "text-green-400");
+          clearResult();
+          clearCaptchaError();
 
-        await iti.promise;
+          let timeout: number | undefined;
 
-        const isValid = fields.reduce(
-          (valid, field) => validateField(field) && valid,
-          true
-        );
+          try {
+            await iti.promise;
 
-        if (!isValid) {
-          const firstInvalid = form.querySelector<HTMLElement>(
-            '[aria-invalid="true"]'
-          );
-
-          firstInvalid?.focus();
-          return;
-        }
-
-        const accessKey = (
-          form.querySelector<HTMLInputElement>(
-            'input[name="access_key"]'
-          )?.value ?? ""
-        ).trim();
-
-        if (!accessKey) {
-          result.textContent =
-            "The contact form is not configured yet. Please contact us directly.";
-
-          result.classList.add("text-red-400");
-          return;
-        }
-
-        // Send international number in E.164 format
-        const internationalNumber = iti.getNumber();
-
-        const formData = new FormData(form);
-        formData.set("phone", internationalNumber);
-
-        const payload = Object.fromEntries(formData.entries());
-
-        submitButton.disabled = true;
-        buttonLabel.textContent = "Sending...";
-
-        const controller = new AbortController();
-        const timeout = window.setTimeout(
-          () => controller.abort(),
-          20000
-        );
-
-        try {
-          const response = await fetch(
-            "https://api.web3forms.com/submit",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-              body: JSON.stringify(payload),
-              signal: controller.signal,
-            }
-          );
-
-          const data = await response.json();
-
-          if (!response.ok || !data.success) {
-            throw new Error(
-              data.message || "Unable to send your message."
+            const isValid = fields.reduce(
+              (valid, field) => validateField(field) && valid,
+              true
             );
+
+            if (!isValid) {
+              form.querySelector<HTMLElement>(
+                '[aria-invalid="true"]'
+              )?.focus();
+
+              return;
+            }
+
+            // Verify CAPTCHA token
+            const captchaResponse =
+              form.querySelector<HTMLTextAreaElement>(
+                'textarea[name="h-captcha-response"]'
+              )?.value.trim() ?? "";
+
+            if (!captchaResponse) {
+              showCaptchaError();
+              return;
+            }
+
+            const accessKey =
+              form.querySelector<HTMLInputElement>(
+                'input[name="access_key"]'
+              )?.value.trim() ?? "";
+
+            if (!accessKey) {
+              showResult(
+                "The contact form is not configured yet. Please contact us directly.",
+                "error"
+              );
+              return;
+            }
+
+            const formData = new FormData(form);
+
+            formData.set("phone", iti.getNumber());
+            formData.set("h-captcha-response", captchaResponse);
+
+            const payload = Object.fromEntries(formData.entries());
+
+            const controller = new AbortController();
+
+            timeout = window.setTimeout(
+              () => controller.abort(),
+              20000
+            );
+
+            const response = await fetch(
+              "https://api.web3forms.com/submit",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal,
+              }
+            );
+
+            const data: {
+              success?: boolean;
+              message?: string;
+            } = await response.json();
+
+            if (!response.ok || !data.success) {
+              throw new Error(
+                data.message || "Unable to send your message."
+              );
+            }
+
+            showResult(
+              "Thank you. Your inquiry has been sent successfully.",
+              "success"
+            );
+
+            form.reset();
+
+            iti.setCountry("in");
+            phoneInput.value = "";
+
+            fields.forEach(clearFieldError);
+
+            // Reset hCaptcha after successful submission
+            const captchaWindow = window as Window & {
+              hcaptcha?: {
+                reset?: () => void;
+              };
+            };
+
+            captchaWindow.hcaptcha?.reset?.();
+
+          } catch (error) {
+            const message =
+              error instanceof Error && error.name === "AbortError"
+                ? "The request timed out. Please try again."
+                : error instanceof Error
+                  ? error.message
+                  : "Something went wrong. Please try again.";
+
+            showResult(message, "error");
+
+          } finally {
+            if (timeout !== undefined) {
+              window.clearTimeout(timeout);
+            }
+
+            isSubmitting = false;
+            submitButton.disabled = false;
+            buttonLabel.textContent = "Send Message";
           }
-
-          result.textContent =
-            "Thank you. Your inquiry has been sent successfully.";
-
-          result.classList.add("text-green-400");
-
-          form.reset();
-
-          iti.setCountry("in");
-          phoneInput.value = "";
-
-          fields.forEach((field) => clearFieldError(field));
-
-        } catch (error) {
-          result.textContent =
-            error instanceof Error && error.name === "AbortError"
-              ? "The request timed out. Please try again."
-              : error instanceof Error
-                ? error.message
-                : "Something went wrong. Please try again.";
-
-          result.classList.add("text-red-400");
-
-        } finally {
-          window.clearTimeout(timeout);
-
-          submitButton.disabled = false;
-          buttonLabel.textContent = "Send Message";
-        }
+        });
       });
-    });
   }
 
   initialiseContactForms();
 
-  document.addEventListener(
-    "astro:page-load",
-    initialiseContactForms
-  );
+  document.addEventListener("astro:page-load", initialiseContactForms);
 </script>
 
 <style>
-  /* Standard contact inputs */
   .contact-form .contact-input {
     display: block;
     width: 100%;
     min-height: 3.25rem;
-    border-radius: 0;
     border: 0;
     border-bottom: 1px solid rgb(255 255 255 / 10%);
+    border-radius: 0;
     background: transparent;
     padding-block: 1rem;
     color: white;
@@ -467,7 +521,6 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
     color: white;
   }
 
-  /* International phone input */
   :global(.contact-form .iti) {
     display: block;
     width: 100%;
@@ -495,7 +548,6 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
     border-color: #f87171;
   }
 
-  /* Country dropdown */
   :global(.contact-form .iti__dropdown-content),
   :global(.contact-form .iti__country-list),
   :global(.contact-form .iti__country) {
@@ -523,7 +575,6 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
     background: #f1f5f9 !important;
   }
 
-  /* Country search */
   :global(.contact-form .iti__search-input) {
     border: 1px solid #d1d5db !important;
     border-radius: 0 !important;
@@ -535,7 +586,6 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
     color: #6b7280 !important;
   }
 
-  /* Selected country button */
   :global(.contact-form .iti__selected-country) {
     border-radius: 0;
   }

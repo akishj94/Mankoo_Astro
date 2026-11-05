@@ -103,7 +103,7 @@ const phones = settings?.phone ?? [];
                                     <div key={phone}>
                                         <a
                                             href={`tel:${phone.replace(/[^\d+]/g, "")}`}
-                                            class="transition-colors text-white/60  hover:text-accent"
+                                            class="transition-colors text-white/60 hover:text-accent"
                                         >
                                             {phone}
                                         </a>
@@ -143,9 +143,12 @@ const phones = settings?.phone ?? [];
                 )}                
             </div>
         </div>       
-        <div class="order-1">
+        <div class="order-1">            
+            <ContactForm/>
+            {pageIntro?.eyebrow && (
+                <p class="mt-5 text-sm text-white/50">{pageIntro.eyebrow}</p>
+            )}
             
-            <ContactForm/>        
         </div>        
     </div>     
   </div>

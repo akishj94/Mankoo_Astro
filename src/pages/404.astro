@@ -1,0 +1,78 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="404 - Page Not Found | Mankoo Presses"
+  description="The page you're looking for could not be found. Explore Mankoo Presses and discover our industrial press machines."
+  canonical="/404"
+  noindex={true}
+>
+  <main
+    class="flex min-h-[50svh] items-center  px-6 pt-[calc(var(--header-height)+clamp(2.5rem,5vw,5rem)*1.5)] pb-12"
+  >
+    <div class="mx-auto w-full max-w-4xl">
+      <!-- 404 -->
+      <h1
+        class="!text-5xl text-white"
+        aria-label="404"
+        >
+        Page not found.
+      </h1>     
+
+      <!-- Description -->
+      <h2
+        class="mt-5 text-base leading-relaxed text-white/50 sm:text-lg"
+      >
+        The page you were looking for could not be found. It might have been removed, renamed, or did not exist in the first place.
+    </h2>
+
+      <!-- Actions -->
+      <div
+        class="mt-10 flex flex-col items-center gap-4 sm:flex-row"
+      >       
+      <a
+        href="/"
+            class="flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] backdrop-blur-[5rem] bg-white/10 px-4 py-4 text-[15px] leading-[1.2] text-white transition-all duration-250 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[16px] md:hover:bg-[rgba(246,246,246,0.25)] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
+            >
+            <span class="inline-flex max-w-[140px] lg:max-w-[160px]">
+                Back to home
+            </span>
+
+            <svg
+                width="15"
+                height="24"
+                class="h-4 w-[15px] shrink-0"
+                viewBox="0 -960 960 960"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+            </svg>
+        </a>
+        <a
+        href="/products"
+            class="flex aspect-[6/3] min-w-[clamp(220px,15vw,300px)] max-w-[300px] items-end justify-between gap-10 rounded-[10px] backdrop-blur-[5rem] bg-white/10 px-4 py-4 text-[15px] leading-[1.2] text-white transition-all duration-250 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[16px] md:hover:bg-[rgba(246,246,246,0.25)] light:bg-ink light:hover:bg-ink/85 light:focus-visible:outline-ink light:md:bg-ink light:md:hover:bg-ink/85"
+            >
+            <span class="inline-flex max-w-[140px] lg:max-w-[160px]">
+                Browse our products
+            </span>
+
+            <svg
+                width="15"
+                height="24"
+                class="h-4 w-[15px] shrink-0"
+                viewBox="0 -960 960 960"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+            </svg>
+        </a>
+      </div>
+
+    </div>
+    
+  </main>
+  <div class="mt-16 lg:mt-24 border-b border-white/10"></div>
+</Layout>

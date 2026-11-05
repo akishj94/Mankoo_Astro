@@ -65,12 +65,12 @@ if (!items.length) {
         aria-roledescription="carousel"
         aria-labelledby="applications-heading"
       >
-        <ul
+        <div
           class="swiper-wrapper"
           aria-label="Machine applications"
         >
           {items.map((app, index) => (
-            <li
+            <div
               class="swiper-slide"
               role="group"
               aria-roledescription="slide"
@@ -102,9 +102,9 @@ if (!items.length) {
                   </p>
                 )}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
 
       <div

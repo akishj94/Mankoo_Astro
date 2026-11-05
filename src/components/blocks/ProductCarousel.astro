@@ -44,7 +44,7 @@ const selectedProducts = products.filter(
           )}
 
           {heading && (
-            <h2 class="mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]">
+            <h2 class="mt-2 lg:mt-4 text-[32px] leading-[1.08] tracking-tight text-[clamp(30px,4vw,56.5px)]">
               {heading}
             </h2>
           )}
@@ -60,9 +60,9 @@ const selectedProducts = products.filter(
 
       <div class="mt-10 sm:mt-14">
         <div class="swiper" data-slider-root>
-          <ul class="swiper-wrapper">
+          <div class="swiper-wrapper">
             {selectedProducts.map((product) => (
-              <li class="swiper-slide">
+              <div class="swiper-slide">
                 <a
                   href={`/product/${product.slug}/`}
                   class="group/slide flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
@@ -79,7 +79,7 @@ const selectedProducts = products.filter(
                     )}
                   </div>
 
-                  <h3 class="mt-5 text-[20px] tracking-tight">
+                  <h3 class="mt-5 text-[20px] tracking-tight transition-colors duration-300 group-hover/slide:text-accent">
                     {product.name}
                   </h3>
 
@@ -89,9 +89,9 @@ const selectedProducts = products.filter(
                     </p>
                   )}
                 </a>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
         <div class="mt-10 flex items-center justify-center gap-6 sm:mt-12 lg:hidden">

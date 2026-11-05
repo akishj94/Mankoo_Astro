@@ -439,11 +439,7 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
               );
             }
 
-            showResult(
-              "Thank you. Your inquiry has been sent successfully.",
-              "success"
-            );
-
+            // Reset the form and phone input
             form.reset();
             iti.setNumber("");
             iti.setSelectedCountry("in");
@@ -451,7 +447,7 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
 
             fields.forEach(clearFieldError);
 
-            // Reset hCaptcha after successful submission
+            // Reset hCaptcha
             const captchaWindow = window as Window & {
               hcaptcha?: {
                 reset?: () => void;
@@ -459,6 +455,12 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
             };
 
             captchaWindow.hcaptcha?.reset?.();
+
+            // Show success only after all reset operations complete
+            showResult(
+              "Thank you. Your inquiry has been sent successfully.",
+              "success"
+            );
 
           } catch (error) {
             const message =

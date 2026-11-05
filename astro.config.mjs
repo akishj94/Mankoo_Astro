@@ -13,6 +13,8 @@ const env = loadEnv(
 );
 
 export default defineConfig({
+  output: 'static',
+
   vite: {
     plugins: [tailwindcss()],
   },

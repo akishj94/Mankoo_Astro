@@ -774,6 +774,7 @@ export const productBySlugQuery = `*[
     },
 
   // Block 8: Applications carousel
+  applicationsHeading,
   applications[] {
     _key,
     heading,

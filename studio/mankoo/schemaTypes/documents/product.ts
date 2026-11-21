@@ -390,6 +390,12 @@ export const product = defineType({
 
     // Block 8: Applications carousel
     defineField({
+      name: "applicationsHeading",
+      title: "Applications Carousel Section Heading",
+      type: "string",
+      group: "pageContent",
+    }),
+    defineField({
       name: "applications",
       title: "8. Applications Carousel",
       type: "array",

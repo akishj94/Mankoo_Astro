@@ -65,7 +65,7 @@ const canonicalUrl = page?.seo?.canonicalUrl || "/";
     content={pageIntro?.description ?? ''}
   />
   {pageIntro?.introMedia ? (
-    <div class="container">    
+    <div class="container lg:mt-[calc(clamp(1.5rem,4.5vw,6.5rem)*-0.5)]">    
       <MediaBlock media={pageIntro.introMedia} aspectRatio="16/9"/>     
     </div>     
   ) : null}
